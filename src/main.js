@@ -80,14 +80,29 @@ function populateLessonSelect() {
   elements.lessonSelect.value = state.selectedLessonId;
 }
 
+function pulseCounter() {
+  const counter = elements.cardCounter;
+  counter.classList.remove('is-updated');
+  // Force a reflow so the animation can be retriggered on every change.
+  void counter.offsetWidth;
+  counter.classList.add('is-updated');
+}
+
 function updateCounter() {
   if (state.deck.length === 0 || !state.current) {
     elements.cardCounter.hidden = true;
     return;
   }
 
+  const nextText = `${state.deckIndex} / ${state.deck.length}`;
+  const changed = elements.cardCounter.textContent !== nextText;
+
   elements.cardCounter.hidden = false;
-  elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+  elements.cardCounter.textContent = nextText;
+
+  if (changed) {
+    pulseCounter();
+  }
 }
 
 async function detectAvailableVideos(words) {

@@ -165,6 +165,29 @@ body {
   white-space: nowrap;
 }
 
+.card-counter.is-updated {
+  animation: counter-bump 0.45s ease-out;
+}
+
+@keyframes counter-bump {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.18);
+    background: var(--accent);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter.is-updated {
+    animation: none;
+  }
+}
+
 .question-area,
 .answer-area {
   display: flex;
