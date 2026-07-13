@@ -244,6 +244,13 @@ function renderAnswer() {
   showVideoIn(slots.answerMedia, state.current);
 }
 
+function scrollToBottom() {
+  window.scrollTo({
+    top: document.documentElement.scrollHeight,
+    behavior: 'smooth',
+  });
+}
+
 function showCompletionModal() {
   pauseVideos();
   elements.completionModal.hidden = false;
@@ -296,12 +303,10 @@ function revealAnswer() {
   elements.nextBtn.hidden = false;
   renderAnswer();
 
-  requestAnimationFrame(() => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
-  });
+  requestAnimationFrame(scrollToBottom);
+
+  const answerVideo = slots.answerMedia.querySelector('.quiz-video');
+  answerVideo?.addEventListener('loadedmetadata', scrollToBottom, { once: true });
 }
 
 async function setMode(mode) {
