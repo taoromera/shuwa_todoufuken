@@ -163,6 +163,34 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.card-counter.is-bumping {
+  animation: card-counter-bump 360ms cubic-bezier(0.2, 0.7, 0.3, 1.2);
+}
+
+@keyframes card-counter-bump {
+  0% {
+    transform: scale(1);
+    background: var(--primary);
+  }
+  45% {
+    transform: scale(1.14);
+    background: var(--accent);
+    box-shadow: 0 4px 14px rgba(43, 108, 176, 0.35);
+  }
+  100% {
+    transform: scale(1);
+    background: var(--primary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter.is-bumping {
+    animation: none;
+  }
 }
 
 .question-area,
