@@ -163,6 +163,35 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  transform-origin: center;
+}
+
+.card-counter.is-updating {
+  animation: counter-bump 0.4s ease-out;
+}
+
+@keyframes counter-bump {
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(1.14);
+  }
+
+  70% {
+    transform: scale(0.98);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter.is-updating {
+    animation: none;
+  }
 }
 
 .question-area,

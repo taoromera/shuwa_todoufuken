@@ -80,14 +80,31 @@ function populateLessonSelect() {
   elements.lessonSelect.value = state.selectedLessonId;
 }
 
-function updateCounter() {
+function updateCounter({ animate = false } = {}) {
   if (state.deck.length === 0 || !state.current) {
     elements.cardCounter.hidden = true;
+    elements.cardCounter.classList.remove('is-updating');
     return;
   }
 
+  const nextText = `${state.deckIndex} / ${state.deck.length}`;
+  const shouldAnimate =
+    animate &&
+    !elements.cardCounter.hidden &&
+    elements.cardCounter.textContent !== nextText;
+
   elements.cardCounter.hidden = false;
-  elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+  elements.cardCounter.textContent = nextText;
+
+  if (!shouldAnimate) {
+    elements.cardCounter.classList.remove('is-updating');
+    return;
+  }
+
+  elements.cardCounter.classList.remove('is-updating');
+  // Restart the bump animation when advancing to the next card.
+  void elements.cardCounter.offsetWidth;
+  elements.cardCounter.classList.add('is-updating');
 }
 
 async function detectAvailableVideos(words) {
@@ -256,7 +273,7 @@ async function beginRound() {
   loadQuestion();
 }
 
-function loadQuestion() {
+function loadQuestion({ animateCounter = false } = {}) {
   resetReveal();
   pauseVideos();
 
@@ -278,7 +295,7 @@ function loadQuestion() {
   state.deckIndex += 1;
   elements.prompt.textContent = PROMPTS[state.mode];
   renderQuestion();
-  updateCounter();
+  updateCounter({ animate: animateCounter });
 }
 
 function revealAnswer() {
@@ -336,7 +353,9 @@ function bindEvents() {
   });
 
   elements.revealBtn.addEventListener('click', revealAnswer);
-  elements.nextBtn.addEventListener('click', loadQuestion);
+  elements.nextBtn.addEventListener('click', () => {
+    loadQuestion({ animateCounter: true });
+  });
   elements.completionOkBtn.addEventListener('click', startNewRound);
 }
 
