@@ -165,6 +165,33 @@ body {
   white-space: nowrap;
 }
 
+.card-counter-pop {
+  animation: card-counter-pop 280ms ease-out;
+}
+
+@keyframes card-counter-pop {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  45% {
+    transform: scale(1.08);
+    filter: brightness(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter-pop {
+    animation: none;
+  }
+}
+
 .question-area,
 .answer-area {
   display: flex;

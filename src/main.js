@@ -25,6 +25,7 @@ const state = {
   deck: [],
   deckIndex: 0,
   availableVideos: new Set(),
+  shouldAnimateCounter: false,
 };
 
 const elements = {
@@ -83,11 +84,19 @@ function populateLessonSelect() {
 function updateCounter() {
   if (state.deck.length === 0 || !state.current) {
     elements.cardCounter.hidden = true;
+    state.shouldAnimateCounter = false;
     return;
   }
 
   elements.cardCounter.hidden = false;
   elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+
+  if (state.shouldAnimateCounter) {
+    elements.cardCounter.classList.remove('card-counter-pop');
+    void elements.cardCounter.offsetWidth;
+    elements.cardCounter.classList.add('card-counter-pop');
+    state.shouldAnimateCounter = false;
+  }
 }
 
 async function detectAvailableVideos(words) {
@@ -251,6 +260,7 @@ function hideCompletionModal() {
 }
 
 async function beginRound() {
+  state.shouldAnimateCounter = false;
   await detectAvailableVideos(getActiveWords());
   resetDeck();
   loadQuestion();
@@ -270,6 +280,7 @@ function loadQuestion() {
   }
 
   if (state.deckIndex >= state.deck.length) {
+    state.shouldAnimateCounter = false;
     showCompletionModal();
     return;
   }
@@ -336,7 +347,10 @@ function bindEvents() {
   });
 
   elements.revealBtn.addEventListener('click', revealAnswer);
-  elements.nextBtn.addEventListener('click', loadQuestion);
+  elements.nextBtn.addEventListener('click', () => {
+    state.shouldAnimateCounter = true;
+    loadQuestion();
+  });
   elements.completionOkBtn.addEventListener('click', startNewRound);
 }
 
