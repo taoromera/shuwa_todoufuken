@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a365d" />
+    <meta name="description" content="レッスンで学んだ日本手話を復習するフラッシュカード" />
+    <title>手話フラッシュカード</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <h1>手話フラッシュカード</h1>
+        <p class="subtitle">レッスンで学んだ言葉を復習しよう</p>
+      </header>
+
+      <div class="lesson-picker">
+        <label class="lesson-picker-label" for="lesson-select">復習するレッスン</label>
+        <select class="lesson-select" id="lesson-select" aria-label="復習するレッスン"></select>
+      </div>
+
+      <nav class="mode-tabs" role="tablist" aria-label="復習モード">
+        <button
+          type="button"
+          class="mode-tab active"
+          data-mode="sign-to-word"
+          role="tab"
+          aria-selected="true"
+        >
+          手話 → 言葉
+        </button>
+        <button
+          type="button"
+          class="mode-tab"
+          data-mode="word-to-sign"
+          role="tab"
+          aria-selected="false"
+        >
+          言葉 → 手話
+        </button>
+      </nav>
+
+      <main class="quiz-card" id="quiz-card">
+        <div class="prompt-row">
+          <p class="prompt" id="prompt">手話を見て、言葉を思い出してみましょう。</p>
+          <p class="card-counter" id="card-counter" hidden></p>
+        </div>
+
+        <div class="question-area" id="question-area"></div>
+
+        <button type="button" class="btn btn-reveal" id="reveal-btn" hidden>
+          答えを見る
+        </button>
+
+        <div class="answer-area" id="answer-area" hidden></div>
+      </main>
+
+      <footer class="footer">
+        <button type="button" class="btn btn-next" id="next-btn" hidden>次のカード</button>
+      </footer>
+    </div>
+
+    <div class="completion-modal" id="completion-modal" hidden>
+      <div
+        class="completion-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="completion-title"
+      >
+        <h2 class="completion-title" id="completion-title">おめでとう！</h2>
+        <p class="completion-message">すべてのカードを復習しました。</p>
+        <button type="button" class="btn btn-next" id="completion-ok-btn">OK</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
