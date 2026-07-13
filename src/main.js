@@ -80,14 +80,25 @@ function populateLessonSelect() {
   elements.lessonSelect.value = state.selectedLessonId;
 }
 
-function updateCounter() {
+function updateCounter({ animateNumber = false } = {}) {
   if (state.deck.length === 0 || !state.current) {
     elements.cardCounter.hidden = true;
     return;
   }
 
+  const currentNumber = document.createElement('span');
+  currentNumber.className = 'card-counter-number';
+  currentNumber.textContent = String(state.deckIndex);
+
+  if (animateNumber) {
+    currentNumber.classList.add('is-changing');
+  }
+
   elements.cardCounter.hidden = false;
-  elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+  elements.cardCounter.replaceChildren(
+    currentNumber,
+    document.createTextNode(` / ${state.deck.length}`),
+  );
 }
 
 async function detectAvailableVideos(words) {
@@ -256,7 +267,7 @@ async function beginRound() {
   loadQuestion();
 }
 
-function loadQuestion() {
+function loadQuestion({ animateCounter = false } = {}) {
   resetReveal();
   pauseVideos();
 
@@ -278,7 +289,7 @@ function loadQuestion() {
   state.deckIndex += 1;
   elements.prompt.textContent = PROMPTS[state.mode];
   renderQuestion();
-  updateCounter();
+  updateCounter({ animateNumber: animateCounter });
 }
 
 function revealAnswer() {
@@ -336,7 +347,7 @@ function bindEvents() {
   });
 
   elements.revealBtn.addEventListener('click', revealAnswer);
-  elements.nextBtn.addEventListener('click', loadQuestion);
+  elements.nextBtn.addEventListener('click', () => loadQuestion({ animateCounter: true }));
   elements.completionOkBtn.addEventListener('click', startNewRound);
 }
 
