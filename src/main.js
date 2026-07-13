@@ -86,8 +86,19 @@ function updateCounter() {
     return;
   }
 
+  const text = `${state.deckIndex} / ${state.deck.length}`;
+  const shouldAnimate =
+    !elements.cardCounter.hidden && elements.cardCounter.textContent !== text;
+
   elements.cardCounter.hidden = false;
-  elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+  elements.cardCounter.textContent = text;
+
+  if (shouldAnimate) {
+    elements.cardCounter.classList.remove('counter-bump');
+    // Force a reflow so the animation restarts even on rapid consecutive clicks.
+    void elements.cardCounter.offsetWidth;
+    elements.cardCounter.classList.add('counter-bump');
+  }
 }
 
 async function detectAvailableVideos(words) {
