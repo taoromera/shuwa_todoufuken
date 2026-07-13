@@ -145,7 +145,7 @@ export function getLessonById(id) {
 export function formatLessonLabel(lesson, { wordCount = null } = {}) {
   const date = formatLessonDate(lesson.date);
   const count = wordCount != null ? ` (${wordCount}語)` : '';
-  return `第${lesson.id}回 · ${lesson.theme} · ${date} · ${lesson.groupName}${count}`;
+  return `第${lesson.id}回 · ${lesson.theme} · ${date}${count}`;
 }
 
 export function getLessonsWithWords(words) {
