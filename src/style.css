@@ -165,6 +165,26 @@ body {
   white-space: nowrap;
 }
 
+.card-counter--highlight {
+  animation: counter-pop 260ms ease-out;
+}
+
+@keyframes counter-pop {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+
+  65% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 .question-area,
 .answer-area {
   display: flex;
@@ -300,5 +320,11 @@ body {
 @media (min-width: 480px) {
   .quiz-card {
     padding: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter--highlight {
+    animation: none;
   }
 }
