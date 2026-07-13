@@ -80,14 +80,42 @@ function populateLessonSelect() {
   elements.lessonSelect.value = state.selectedLessonId;
 }
 
-function updateCounter() {
+function updateCounter({ animate = false } = {}) {
   if (state.deck.length === 0 || !state.current) {
     elements.cardCounter.hidden = true;
+    delete elements.cardCounter.dataset.currentValue;
     return;
   }
 
+  const currentValue = String(state.deckIndex);
+  const shouldAnimate =
+    animate &&
+    elements.cardCounter.dataset.currentValue != null &&
+    elements.cardCounter.dataset.currentValue !== currentValue;
+  const current = document.createElement('span');
+  const separator = document.createElement('span');
+  const total = document.createElement('span');
+
+  current.className = 'card-counter-current';
+  if (shouldAnimate) {
+    current.classList.add('is-animating');
+  }
+  current.textContent = currentValue;
+
+  separator.className = 'card-counter-separator';
+  separator.setAttribute('aria-hidden', 'true');
+  separator.textContent = ' / ';
+
+  total.className = 'card-counter-total';
+  total.textContent = String(state.deck.length);
+
   elements.cardCounter.hidden = false;
-  elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+  elements.cardCounter.replaceChildren(current, separator, total);
+  elements.cardCounter.dataset.currentValue = currentValue;
+  elements.cardCounter.setAttribute(
+    'aria-label',
+    `カード ${currentValue} / ${state.deck.length}`,
+  );
 }
 
 async function detectAvailableVideos(words) {
@@ -256,7 +284,7 @@ async function beginRound() {
   loadQuestion();
 }
 
-function loadQuestion() {
+function loadQuestion({ animateCounter = false } = {}) {
   resetReveal();
   pauseVideos();
 
@@ -278,7 +306,7 @@ function loadQuestion() {
   state.deckIndex += 1;
   elements.prompt.textContent = PROMPTS[state.mode];
   renderQuestion();
-  updateCounter();
+  updateCounter({ animate: animateCounter });
 }
 
 function revealAnswer() {
@@ -336,7 +364,9 @@ function bindEvents() {
   });
 
   elements.revealBtn.addEventListener('click', revealAnswer);
-  elements.nextBtn.addEventListener('click', loadQuestion);
+  elements.nextBtn.addEventListener('click', () => {
+    loadQuestion({ animateCounter: true });
+  });
   elements.completionOkBtn.addEventListener('click', startNewRound);
 }
 
