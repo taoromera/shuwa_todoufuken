@@ -40,6 +40,12 @@ const elements = {
   completionOkBtn: document.getElementById('completion-ok-btn'),
 };
 
+const counterParts = {
+  current: document.createElement('span'),
+  separator: document.createElement('span'),
+  total: document.createElement('span'),
+};
+
 const slots = {
   questionMedia: document.createElement('div'),
   questionWord: document.createElement('div'),
@@ -80,14 +86,37 @@ function populateLessonSelect() {
   elements.lessonSelect.value = state.selectedLessonId;
 }
 
-function updateCounter() {
+function setupCounter() {
+  counterParts.current.className = 'card-counter-current';
+  counterParts.separator.className = 'card-counter-separator';
+  counterParts.separator.textContent = ' / ';
+  counterParts.total.className = 'card-counter-total';
+  elements.cardCounter.replaceChildren(
+    counterParts.current,
+    counterParts.separator,
+    counterParts.total,
+  );
+}
+
+function updateCounter({ animate = false } = {}) {
   if (state.deck.length === 0 || !state.current) {
     elements.cardCounter.hidden = true;
+    elements.cardCounter.classList.remove('card-counter-animate');
     return;
   }
 
   elements.cardCounter.hidden = false;
-  elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+  counterParts.current.textContent = String(state.deckIndex);
+  counterParts.total.textContent = String(state.deck.length);
+
+  if (!animate) {
+    elements.cardCounter.classList.remove('card-counter-animate');
+    return;
+  }
+
+  elements.cardCounter.classList.remove('card-counter-animate');
+  void elements.cardCounter.offsetWidth;
+  elements.cardCounter.classList.add('card-counter-animate');
 }
 
 async function detectAvailableVideos(words) {
@@ -256,7 +285,7 @@ async function beginRound() {
   loadQuestion();
 }
 
-function loadQuestion() {
+function loadQuestion({ animateCounter = false } = {}) {
   resetReveal();
   pauseVideos();
 
@@ -278,7 +307,7 @@ function loadQuestion() {
   state.deckIndex += 1;
   elements.prompt.textContent = PROMPTS[state.mode];
   renderQuestion();
-  updateCounter();
+  updateCounter({ animate: animateCounter });
 }
 
 function revealAnswer() {
@@ -336,12 +365,15 @@ function bindEvents() {
   });
 
   elements.revealBtn.addEventListener('click', revealAnswer);
-  elements.nextBtn.addEventListener('click', loadQuestion);
+  elements.nextBtn.addEventListener('click', () => {
+    loadQuestion({ animateCounter: true });
+  });
   elements.completionOkBtn.addEventListener('click', startNewRound);
 }
 
 async function init() {
   setupViewSlots();
+  setupCounter();
   populateLessonSelect();
   bindEvents();
   await beginRound();

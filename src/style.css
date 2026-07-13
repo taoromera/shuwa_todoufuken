@@ -154,6 +154,8 @@ body {
 .card-counter {
   margin: 0;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--primary);
@@ -163,6 +165,32 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   white-space: nowrap;
+}
+
+.card-counter-current {
+  display: inline-block;
+  min-width: 1ch;
+}
+
+.card-counter.card-counter-animate .card-counter-current {
+  animation: counter-bump 220ms ease-out;
+}
+
+@keyframes counter-bump {
+  0% {
+    opacity: 0.6;
+    transform: translateY(3px) scale(0.94);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.03);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .question-area,
@@ -300,5 +328,11 @@ body {
 @media (min-width: 480px) {
   .quiz-card {
     padding: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter.card-counter-animate .card-counter-current {
+    animation: none;
   }
 }
