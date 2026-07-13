@@ -25,6 +25,7 @@ const state = {
   deck: [],
   deckIndex: 0,
   availableVideos: new Set(),
+  lastCounterIndex: null,
 };
 
 const elements = {
@@ -83,11 +84,32 @@ function populateLessonSelect() {
 function updateCounter() {
   if (state.deck.length === 0 || !state.current) {
     elements.cardCounter.hidden = true;
+    elements.cardCounter.replaceChildren();
+    state.lastCounterIndex = null;
     return;
   }
 
+  const previousIndex = state.lastCounterIndex;
+  const currentIndex = state.deckIndex;
+
   elements.cardCounter.hidden = false;
-  elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+
+  const currentEl = document.createElement('span');
+  currentEl.className = 'card-counter-current';
+  currentEl.textContent = String(currentIndex);
+
+  const separatorEl = document.createTextNode(` / ${state.deck.length}`);
+
+  elements.cardCounter.replaceChildren(currentEl, separatorEl);
+
+  if (previousIndex !== null && previousIndex !== currentIndex) {
+    currentEl.classList.remove('is-bumping');
+    // Force reflow so the animation restarts even when the class is re-added.
+    void currentEl.offsetWidth;
+    currentEl.classList.add('is-bumping');
+  }
+
+  state.lastCounterIndex = currentIndex;
 }
 
 async function detectAvailableVideos(words) {
@@ -123,6 +145,7 @@ function shuffleArray(items) {
 function resetDeck() {
   state.deck = shuffleArray(getPlayableWords());
   state.deckIndex = 0;
+  state.lastCounterIndex = null;
 }
 
 function setupViewSlots() {

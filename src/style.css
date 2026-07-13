@@ -165,6 +165,36 @@ body {
   white-space: nowrap;
 }
 
+.card-counter-current {
+  display: inline-block;
+  transform-origin: center;
+}
+
+.card-counter-current.is-bumping {
+  animation: card-counter-bump 360ms ease-out;
+}
+
+@keyframes card-counter-bump {
+  0% {
+    transform: scale(1);
+    color: #fff;
+  }
+  40% {
+    transform: scale(1.35);
+    color: #ffe38a;
+  }
+  100% {
+    transform: scale(1);
+    color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter-current.is-bumping {
+    animation: none;
+  }
+}
+
 .question-area,
 .answer-area {
   display: flex;
