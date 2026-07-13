@@ -163,6 +163,11 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  transform-origin: center;
+}
+
+.card-counter.is-updating {
+  animation: counter-pop 0.42s ease-out;
 }
 
 .question-area,
@@ -300,5 +305,31 @@ body {
 @media (min-width: 480px) {
   .quiz-card {
     padding: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-counter.is-updating {
+    animation: none;
+  }
+}
+
+@keyframes counter-pop {
+  0% {
+    transform: scale(1);
+    background: var(--primary);
+    box-shadow: none;
+  }
+
+  45% {
+    transform: scale(1.12);
+    background: var(--accent);
+    box-shadow: 0 6px 14px rgba(43, 108, 176, 0.22);
+  }
+
+  100% {
+    transform: scale(1);
+    background: var(--primary);
+    box-shadow: none;
   }
 }
