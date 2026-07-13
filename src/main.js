@@ -88,6 +88,10 @@ function updateCounter() {
 
   elements.cardCounter.hidden = false;
   elements.cardCounter.textContent = `${state.deckIndex} / ${state.deck.length}`;
+  elements.cardCounter.classList.remove('card-counter--bump');
+  // Force a reflow so removing then re-adding the class always restarts the animation.
+  void elements.cardCounter.offsetWidth;
+  elements.cardCounter.classList.add('card-counter--bump');
 }
 
 async function detectAvailableVideos(words) {
