@@ -1,35 +1,10 @@
 import { WORDS as DEFAULT_WORDS } from './words.js';
 
-const STORAGE_KEY = 'shuwa-words-v1';
-
-function readStoredWords() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : null;
-  } catch {
-    return null;
-  }
+function escapeJsString(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
 export function getWords() {
-  return readStoredWords() ?? [...DEFAULT_WORDS];
-}
-
-export function saveWords(words) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
-}
-
-export function hasCustomWords() {
-  return readStoredWords() !== null;
-}
-
-export function resetWords() {
-  localStorage.removeItem(STORAGE_KEY);
   return [...DEFAULT_WORDS];
 }
 
@@ -38,37 +13,43 @@ export function getWordsForLesson(lessonId) {
   return getWords().filter((word) => word.lesson === id);
 }
 
-export function addWord(word) {
-  const words = getWords();
-  const duplicate = words.some(
-    (entry) => entry.lesson === word.lesson && entry.code === word.code,
+export function getWordId(word) {
+  return word.id ?? word.video ?? `${word.title}\u0000${word.caption}`;
+}
+
+export function addWord(word, words = getWords()) {
+  const next = [...words];
+  const duplicate = next.some(
+    (entry) =>
+      entry.lesson === word.lesson &&
+      entry.title === word.title &&
+      entry.caption === word.caption,
   );
 
   if (duplicate) {
     throw new Error(`「${word.title}」はこのレッスンに既に追加されています。`);
   }
 
-  words.push(word);
-  saveWords(words);
-  return words;
+  next.push(word);
+  return next;
 }
 
-export function removeWord(lessonId, code) {
+export function removeWord(lessonId, wordId, words = getWords()) {
   const id = typeof lessonId === 'string' ? Number(lessonId) : lessonId;
-  const words = getWords().filter((word) => !(word.lesson === id && word.code === code));
-  saveWords(words);
-  return words;
+  return words.filter((word) => !(word.lesson === id && getWordId(word) === wordId));
 }
 
 function formatWordEntry(word) {
-  return `  {
-    lesson: ${word.lesson},
-    title: '${word.title}',
-    caption: '${word.caption}',
-    subdir: '${word.subdir}',
-    code: '${word.code}',
-    avatarId: ${word.avatarId},
-  }`;
+  const fields = [
+    `lesson: ${word.lesson}`,
+    `title: '${escapeJsString(word.title)}'`,
+    `caption: '${escapeJsString(word.caption)}'`,
+  ];
+
+  if (word.id) fields.push(`id: '${escapeJsString(word.id)}'`);
+  if (word.video) fields.push(`video: '${escapeJsString(word.video)}'`);
+
+  return `  {\n${fields.map((field) => `    ${field},`).join('\n')}\n  }`;
 }
 
 export function exportWordsJs(words = getWords()) {
@@ -93,19 +74,32 @@ export function exportWordsJs(words = getWords()) {
   return `/**
  * Add new lesson words here.
  *
- * To look up NHK metadata for a word:
- *   npm run lookup -- 北海道
- *
  * Fields:
  * - lesson: lesson id (see lessons.js for metadata)
  * - title: Japanese word shown as the answer
  * - caption: reading shown under the answer (usually hiragana)
- * - subdir: NHK dictionary folder (common | area | jp | eng | num)
- * - code: 6-digit NHK dictionary code (used as fallback video name)
- * - avatarId: legacy NHK field, usually 1
+ * - id: unique id for manually added words
+ * - video: relative path to the sign video
  */
 export const WORDS = [
 ${blocks.join(',\n')},
 ];
 `;
+}
+
+export async function saveWordsFile(words) {
+  const response = await fetch('/api/words', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/javascript; charset=utf-8' },
+    body: exportWordsJs(words),
+  });
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      result.error || 'words.js の保存に失敗しました。npm run dev で起動しているか確認してください。',
+    );
+  }
+
+  return result;
 }

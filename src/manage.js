@@ -1,14 +1,16 @@
 import { LESSONS, formatLessonLabel } from './data/lessons.js';
-import { searchNhkWords, toLessonWord } from './data/nhk-lookup.js';
-import { videoFileName } from './data/videos.js';
+import { videoFileNameFromReading } from './data/romanize.js';
 import {
   addWord,
-  exportWordsJs,
-  getWordsForLesson,
-  hasCustomWords,
+  getWordId,
+  getWords,
   removeWord,
-  resetWords,
+  saveWordsFile,
 } from './data/word-store.js';
+
+function videoOutputFileName(videoPath) {
+  return videoPath.split('/').pop();
+}
 
 const elements = {
   lessonSelect: document.getElementById('lesson-select'),
@@ -16,16 +18,12 @@ const elements = {
   wordList: document.getElementById('word-list'),
   wordCount: document.getElementById('word-count'),
   emptyMessage: document.getElementById('empty-message'),
-  searchForm: document.getElementById('search-form'),
-  searchInput: document.getElementById('search-input'),
-  searchResults: document.getElementById('search-results'),
   videoInput: document.getElementById('video-input'),
   manualForm: document.getElementById('manual-form'),
-  exportBtn: document.getElementById('export-btn'),
-  resetBtn: document.getElementById('reset-btn'),
 };
 
-let selectedLessonId = LESSONS[0]?.id ?? 1;
+let selectedLessonId = null;
+let words = getWords();
 
 function setStatus(message, type = '') {
   elements.status.textContent = message;
@@ -33,7 +31,29 @@ function setStatus(message, type = '') {
 }
 
 function getSelectedLessonId() {
-  return Number(elements.lessonSelect.value);
+  const value = elements.lessonSelect.value;
+  return value ? Number(value) : null;
+}
+
+function hasSelectedLesson() {
+  return getSelectedLessonId() != null;
+}
+
+function wordsForLesson(lessonId) {
+  return words.filter((word) => word.lesson === lessonId);
+}
+
+function updateAddFormState() {
+  const enabled = hasSelectedLesson();
+  const addButton = elements.manualForm.querySelector('button[type="submit"]');
+
+  elements.manualForm.querySelectorAll('input').forEach((input) => {
+    input.disabled = !enabled;
+  });
+  elements.videoInput.disabled = !enabled;
+  if (addButton) {
+    addButton.disabled = !enabled;
+  }
 }
 
 async function processAndAddWord(word, button) {
@@ -42,16 +62,13 @@ async function processAndAddWord(word, button) {
     throw new Error('追加する動画ファイルを選択してください。');
   }
 
-  const duplicate = getWordsForLesson(word.lesson).some((entry) => entry.code === word.code);
-  if (duplicate) {
-    throw new Error(`「${word.title}」はこのレッスンに既に追加されています。`);
-  }
+  const nextWords = addWord(word, words);
 
   button.disabled = true;
   setStatus(`「${word.title}」の動画を処理中…`);
 
   try {
-    const fileName = videoFileName(word);
+    const fileName = videoOutputFileName(word.video);
     const response = await fetch(
       `/api/videos/process?fileName=${encodeURIComponent(fileName)}`,
       {
@@ -66,7 +83,9 @@ async function processAndAddWord(word, button) {
       throw new Error(result.error || '動画の処理に失敗しました。開発サーバーを確認してください。');
     }
 
-    addWord(word);
+    setStatus(`「${word.title}」を words.js に保存中…`);
+    await saveWordsFile(nextWords);
+    words = nextWords;
     elements.videoInput.value = '';
     return result;
   } finally {
@@ -77,26 +96,42 @@ async function processAndAddWord(word, button) {
 function populateLessonSelect() {
   elements.lessonSelect.innerHTML = '';
 
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'レッスンを選択';
+  elements.lessonSelect.appendChild(placeholder);
+
   for (const lesson of LESSONS) {
     const option = document.createElement('option');
-    const wordCount = getWordsForLesson(lesson.id).length;
+    const wordCount = wordsForLesson(lesson.id).length;
     option.value = String(lesson.id);
     option.textContent = formatLessonLabel(lesson, { wordCount });
     elements.lessonSelect.appendChild(option);
   }
 
-  elements.lessonSelect.value = String(selectedLessonId);
+  elements.lessonSelect.value =
+    selectedLessonId != null ? String(selectedLessonId) : '';
 }
 
 function renderWordList() {
   const lessonId = getSelectedLessonId();
-  const words = getWordsForLesson(lessonId);
 
-  elements.wordCount.textContent = `${words.length} 語`;
+  if (lessonId == null) {
+    elements.wordCount.textContent = '';
+    elements.wordList.innerHTML = '';
+    elements.emptyMessage.hidden = false;
+    elements.emptyMessage.textContent = 'レッスンを選択してください。';
+    return;
+  }
+
+  const lessonWords = wordsForLesson(lessonId);
+
+  elements.wordCount.textContent = `${lessonWords.length} 語`;
   elements.wordList.innerHTML = '';
-  elements.emptyMessage.hidden = words.length > 0;
+  elements.emptyMessage.textContent = 'このレッスンにはまだ単語がありません。';
+  elements.emptyMessage.hidden = lessonWords.length > 0;
 
-  for (const word of words) {
+  for (const word of lessonWords) {
     const item = document.createElement('li');
     item.className = 'word-list-item';
 
@@ -105,17 +140,27 @@ function renderWordList() {
     text.innerHTML = `
       <p class="word-list-title">${word.title}</p>
       <p class="word-list-caption">${word.caption}</p>
-      <p class="word-list-meta">${word.subdir} · ${word.code} · ${videoFileName(word)}</p>
     `;
 
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.className = 'btn-remove';
     removeBtn.textContent = '削除';
-    removeBtn.addEventListener('click', () => {
-      removeWord(lessonId, word.code);
-      refresh();
-      setStatus(`「${word.title}」を削除しました。`, 'success');
+    removeBtn.addEventListener('click', async () => {
+      removeBtn.disabled = true;
+      setStatus(`「${word.title}」を削除中…`);
+
+      try {
+        const nextWords = removeWord(lessonId, getWordId(word), words);
+        await saveWordsFile(nextWords);
+        words = nextWords;
+        refresh();
+        setStatus(`「${word.title}」を削除し、words.js を更新しました。`, 'success');
+      } catch (error) {
+        setStatus(error.message, 'error');
+      } finally {
+        removeBtn.disabled = false;
+      }
     });
 
     item.append(text, removeBtn);
@@ -123,67 +168,30 @@ function renderWordList() {
   }
 }
 
-function renderSearchResults(results) {
-  elements.searchResults.innerHTML = '';
-  elements.searchResults.hidden = results.length === 0;
-
-  if (results.length === 0) {
-    return;
-  }
-
-  for (const result of results) {
-    const item = document.createElement('li');
-    item.className = 'search-result-item';
-
-    const text = document.createElement('div');
-    text.className = 'word-list-text';
-    text.innerHTML = `
-      <p class="word-list-title">${result.title}</p>
-      <p class="word-list-caption">${result.caption}</p>
-      <p class="word-list-meta">${result.subdir} · ${result.code} · ${videoFileName(result)}</p>
-    `;
-
-    const addBtn = document.createElement('button');
-    addBtn.type = 'button';
-    addBtn.className = 'btn-pick';
-    addBtn.textContent = '追加';
-    addBtn.addEventListener('click', async () => {
-      try {
-        const word = toLessonWord(result, getSelectedLessonId());
-        const processed = await processAndAddWord(word, addBtn);
-        elements.searchResults.hidden = true;
-        elements.searchInput.value = '';
-        refresh();
-        setStatus(
-          `「${word.title}」を追加し、動画を${processed.duration.toFixed(2)}秒に切り抜きました。`,
-          'success',
-        );
-      } catch (error) {
-        setStatus(error.message, 'error');
-      }
-    });
-
-    item.append(text, addBtn);
-    elements.searchResults.appendChild(item);
-  }
-}
-
 function refresh() {
   selectedLessonId = getSelectedLessonId();
   populateLessonSelect();
   renderWordList();
+  updateAddFormState();
 }
 
 async function handleManualAdd(event) {
   event.preventDefault();
 
+  const lessonId = getSelectedLessonId();
+  if (lessonId == null) {
+    setStatus('レッスンを選択してください。', 'error');
+    return;
+  }
+
+  const caption = document.getElementById('manual-caption').value.trim();
+  const fileName = videoFileNameFromReading(caption, words);
   const word = {
-    lesson: getSelectedLessonId(),
+    id: crypto.randomUUID(),
+    lesson: lessonId,
     title: document.getElementById('manual-title').value.trim(),
-    caption: document.getElementById('manual-caption').value.trim(),
-    subdir: document.getElementById('manual-subdir').value,
-    code: document.getElementById('manual-code').value.trim(),
-    avatarId: 1,
+    caption,
+    video: `./videos/${fileName}`,
   };
 
   const addButton = elements.manualForm.querySelector('button[type="submit"]');
@@ -193,66 +201,12 @@ async function handleManualAdd(event) {
     elements.manualForm.reset();
     refresh();
     setStatus(
-      `「${word.title}」を追加し、動画を${processed.duration.toFixed(2)}秒に切り抜きました。`,
+      `「${word.title}」を追加し、${fileName}（${processed.duration.toFixed(2)}秒）を保存、words.js を更新しました。`,
       'success',
     );
   } catch (error) {
     setStatus(error.message, 'error');
   }
-}
-
-async function handleSearch(event) {
-  event.preventDefault();
-
-  const query = elements.searchInput.value.trim();
-  if (!query) {
-    setStatus('検索する言葉を入力してください。', 'error');
-    return;
-  }
-
-  setStatus('検索中…');
-
-  try {
-    const results = await searchNhkWords(query);
-    renderSearchResults(results);
-
-    if (results.length === 0) {
-      setStatus(`「${query}」の検索結果はありませんでした。`, 'error');
-      return;
-    }
-
-    setStatus(`${results.length} 件見つかりました。`);
-  } catch (error) {
-    renderSearchResults([]);
-    setStatus(error.message, 'error');
-  }
-}
-
-function handleExport() {
-  const content = exportWordsJs();
-  const blob = new Blob([content], { type: 'text/javascript;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'words.js';
-  link.click();
-  URL.revokeObjectURL(url);
-  setStatus('words.js をダウンロードしました。src/data/words.js に上書きして保存できます。', 'success');
-}
-
-function handleReset() {
-  const confirmed = window.confirm(
-    'ブラウザに保存した変更を破棄し、元の words.js の内容に戻しますか？',
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  resetWords();
-  refresh();
-  elements.searchResults.hidden = true;
-  setStatus('初期データに戻しました。', 'success');
 }
 
 function bindEvents() {
@@ -261,19 +215,13 @@ function bindEvents() {
     setStatus('');
   });
 
-  elements.searchForm.addEventListener('submit', handleSearch);
   elements.manualForm.addEventListener('submit', handleManualAdd);
-  elements.exportBtn.addEventListener('click', handleExport);
-  elements.resetBtn.addEventListener('click', handleReset);
 }
 
 function init() {
   bindEvents();
   refresh();
-
-  if (hasCustomWords()) {
-    setStatus('ブラウザに保存した変更が反映されています。');
-  }
+  setStatus('まずレッスンを選択してください。追加・削除は src/data/words.js に保存されます。');
 }
 
 init();

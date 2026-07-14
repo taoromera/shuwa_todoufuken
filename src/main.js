@@ -3,8 +3,6 @@ import {
   formatLessonLabel,
   getLessonsWithWords,
 } from './data/lessons.js';
-import { videoFileName, videoUrl } from './data/videos.js';
-
 const MODES = {
   SIGN_TO_WORD: 'sign-to-word',
   WORD_TO_SIGN: 'word-to-sign',
@@ -97,9 +95,13 @@ function updateCounter() {
 async function detectAvailableVideos(words) {
   const checks = await Promise.all(
     words.map(async (word) => {
+      if (!word.video) {
+        return null;
+      }
+
       try {
-        const response = await fetch(videoUrl(word), { method: 'HEAD' });
-        return response.ok ? word.code : null;
+        const response = await fetch(word.video, { method: 'HEAD' });
+        return response.ok ? word.video : null;
       } catch {
         return null;
       }
@@ -110,7 +112,7 @@ async function detectAvailableVideos(words) {
 }
 
 function getPlayableWords() {
-  return getActiveWords().filter((word) => state.availableVideos.has(word.code));
+  return getActiveWords().filter((word) => state.availableVideos.has(word.video));
 }
 
 function shuffleArray(items) {
@@ -170,7 +172,7 @@ function renderWordCard(word, { label = null } = {}) {
 function renderVideo(word, { autoplay = true, controls = true, loop = true } = {}) {
   const video = document.createElement('video');
   video.className = 'quiz-video';
-  video.src = videoUrl(word);
+  video.src = word.video;
   video.playsInline = true;
   video.controls = controls;
   video.preload = 'auto';
@@ -191,14 +193,14 @@ function renderVideo(word, { autoplay = true, controls = true, loop = true } = {
 function renderMissingVideo(word) {
   const missing = document.createElement('p');
   missing.className = 'missing-video';
-  missing.textContent = `「${word.title}」の動画（${videoFileName(word)}）がまだありません。`;
+  missing.textContent = `「${word.title}」の動画（${word.video}）がまだありません。`;
   return missing;
 }
 
 function showVideoIn(target, word) {
   target.replaceChildren();
 
-  if (!state.availableVideos.has(word.code)) {
+  if (!state.availableVideos.has(word.video)) {
     target.appendChild(renderMissingVideo(word));
     return;
   }

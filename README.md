@@ -11,17 +11,14 @@
 
 ### 1. 動画を用意する
 
-各単語の動画を `videos/` フォルダに置きます。都道府県はローマ字ファイル名を使います（例: `hokkaido.webm`）。その他の単語は `{code}.webm` か、単語データの `video` フィールドで指定できます。
+各単語の動画を `videos/` フォルダに置き、カードの `video` に相対パスを書きます。
 
 ```js
 {
   lesson: 3,
   title: '北海道',
   caption: 'ほっかいどう',
-  subdir: 'common',
-  code: '003418',
-  avatarId: 1,
-  video: 'hokkaido.webm', // 省略時は {code}.webm
+  video: './videos/hokkaido.webm',
 },
 ```
 
@@ -45,7 +42,7 @@ npm run preview
 
 ### 管理ページ（`manage.html`）
 
-ブラウザで `manage.html` を開き、レッスンごとに単語を追加・削除できます。NHK 手話辞書の検索でメタデータを取得できます（動画は別途 `videos/` に配置してください）。
+`npm run dev` で起動し、ブラウザで `manage.html` を開きます。単語の追加・削除は `src/data/words.js` に直接書き込まれます。
 
 ### `src/data/words.js` を直接編集
 
@@ -54,27 +51,17 @@ npm run preview
   lesson: 2,
   title: 'ありがとう',
   caption: 'ありがとう',
-  subdir: 'common',
-  code: '001234',
-  avatarId: 1,
+  id: 'unique-id',
+  video: './videos/arigatou.webm',
 },
-```
-
-NHK のメタデータを調べる場合:
-
-```bash
-npm run lookup -- ありがとう
 ```
 
 ## ファイル構成
 
 ```text
 src/
-  data/words.js       # レッスン単語リスト
-  data/videos.js      # 動画パスの解決
+  data/words.js       # レッスン単語リスト（video パス含む）
 videos/               # 手話動画（自分で用意）
-scripts/
-  lookup-word.ps1     # 単語メタデータの検索（任意）
 ```
 
 ## 注意

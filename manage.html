@@ -39,56 +39,21 @@
           <label class="field-label" for="video-input">元の動画</label>
           <input class="file-input" id="video-input" type="file" accept="video/*" />
           <p class="field-help">
-            追加時に指定範囲を切り抜き、繰り返し1回分を videos フォルダに保存します。
+            追加時に指定範囲を切り抜き、繰り返し1回分を videos フォルダへ保存し、単語データは
+            src/data/words.js に書き込みます（npm run dev が必要）。
           </p>
         </div>
 
-        <form class="search-form" id="search-form">
-          <label class="field-label" for="search-input">NHK手話辞書で検索</label>
-          <div class="search-row">
-            <input
-              class="text-input"
-              id="search-input"
-              type="search"
-              placeholder="例: 北海道"
-              autocomplete="off"
-            />
-            <button class="btn btn-search" type="submit">検索</button>
-          </div>
+        <form class="manual-form" id="manual-form">
+          <label class="field-label" for="manual-title">言葉</label>
+          <input class="text-input" id="manual-title" required />
+
+          <label class="field-label" for="manual-caption">ひらがな</label>
+          <input class="text-input" id="manual-caption" required />
+
+          <button class="btn btn-add" type="submit">追加</button>
         </form>
-
-        <ul class="search-results" id="search-results" hidden></ul>
-
-        <details class="manual-entry">
-          <summary>手動で入力する</summary>
-          <form class="manual-form" id="manual-form">
-            <label class="field-label" for="manual-title">言葉</label>
-            <input class="text-input" id="manual-title" required />
-
-            <label class="field-label" for="manual-caption">よみ（ひらがな）</label>
-            <input class="text-input" id="manual-caption" required />
-
-            <label class="field-label" for="manual-subdir">フォルダ</label>
-            <select class="text-input" id="manual-subdir" required>
-              <option value="common">common</option>
-              <option value="area">area</option>
-              <option value="jp">jp</option>
-              <option value="eng">eng</option>
-              <option value="num">num</option>
-            </select>
-
-            <label class="field-label" for="manual-code">コード（6桁）</label>
-            <input class="text-input" id="manual-code" pattern="\d{6}" required />
-
-            <button class="btn btn-add" type="submit">追加</button>
-          </form>
-        </details>
       </section>
-
-      <footer class="manage-actions">
-        <button class="btn btn-export" type="button" id="export-btn">words.js をダウンロード</button>
-        <button class="btn btn-reset" type="button" id="reset-btn">初期データに戻す</button>
-      </footer>
     </div>
 
     <script type="module" src="/src/manage.js"></script>
