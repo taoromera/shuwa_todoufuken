@@ -24,6 +24,24 @@
 
 動画がある単語だけがデッキに含まれます。
 
+#### NHK手話CGを録画する
+
+Playwright用のChromiumとffmpegを用意すると、指定した単語の手話CGを5秒間のWebM動画として録画できます。
+
+```bash
+npx playwright install chromium
+npm run record:sign -- "作る"
+```
+
+既定では `videos/作る.webm` に保存されます。出力先や検索結果を指定する場合:
+
+```bash
+npm run record:sign -- "作る" --output videos/tsukuru.webm
+npm run record:sign -- "作る" --result 2
+```
+
+録画はNHKの検索結果から完全一致する単語を優先し、該当しない場合は最初の結果を使います。`--result` は検索結果の1番目を `1` として指定します。個人学習の範囲で利用し、NHKサイトの利用条件と著作権を確認してください。
+
 ### 2. 開発サーバー
 
 ```bash
