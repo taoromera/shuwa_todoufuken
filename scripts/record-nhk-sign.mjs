@@ -155,7 +155,14 @@ async function launchBrowser() {
 
 async function selectSearchResult(page, word, requestedResult) {
   const resultLinks = page.locator('#searchResult > a');
-  await resultLinks.first().waitFor({ state: 'visible', timeout: PLAYER_TIMEOUT_MS });
+  await page.waitForFunction(
+    () => {
+      const count = document.querySelector('#search_count')?.textContent?.trim();
+      return count && count !== '00件';
+    },
+    undefined,
+    { polling: 250, timeout: PLAYER_TIMEOUT_MS },
+  );
 
   const results = await resultLinks.evaluateAll((links) =>
     links.map((link) => ({
@@ -163,6 +170,10 @@ async function selectSearchResult(page, word, requestedResult) {
       caption: link.dataset.caption ?? '',
     })),
   );
+
+  if (results.length === 0) {
+    throw new Error(`「${word}」に一致する手話CGが見つかりませんでした。`);
+  }
 
   let selectedIndex;
   if (requestedResult) {
@@ -210,32 +221,48 @@ async function prepareAnimationTracking(page) {
 }
 
 async function waitForAnimation(page) {
-  await page.waitForFunction(
-    () => {
-      Player.GetTotalTime();
-      const totalTime = window.__nhkRecorderState?.totalTime;
-      return totalTime && totalTime !== '00:00:00';
-    },
-    undefined,
-    { polling: 250, timeout: PLAYER_TIMEOUT_MS },
-  );
+  try {
+    await page.waitForFunction(
+      () => {
+        Player.GetTotalTime();
+        const totalTime = window.__nhkRecorderState?.totalTime;
+        return totalTime && totalTime !== '00:00:00';
+      },
+      undefined,
+      { polling: 250, timeout: PLAYER_TIMEOUT_MS },
+    );
+  } catch (error) {
+    const state = await page.evaluate(() => window.__nhkRecorderState);
+    throw new Error(
+      `手話CGの読み込みが完了しませんでした（再生時間: ${state?.totalTime ?? '未取得'}）。`,
+      { cause: error },
+    );
+  }
 
   // Start at the beginning of a loop so repeated runs produce comparable clips.
-  await page.waitForFunction(
-    () => {
-      Player.GetCurrentTime();
-      const value = window.__nhkRecorderState?.currentTime;
-      const match = /^(\d+):(\d+):(\d+(?:\.\d+)?)$/.exec(value ?? '');
-      if (!match) {
-        return false;
-      }
+  try {
+    await page.waitForFunction(
+      () => {
+        Player.GetCurrentTime();
+        const value = window.__nhkRecorderState?.currentTime;
+        const parts = (value ?? '').split(':').map(Number);
+        if (parts.length < 2 || parts.some((part) => !Number.isFinite(part))) {
+          return false;
+        }
 
-      const seconds = Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]);
-      return seconds <= 0.15;
-    },
-    undefined,
-    { polling: 50, timeout: PLAYER_TIMEOUT_MS },
-  );
+        const seconds = parts.reduce((total, part) => total * 60 + part, 0);
+        return seconds <= 0.15;
+      },
+      undefined,
+      { polling: 50, timeout: PLAYER_TIMEOUT_MS },
+    );
+  } catch (error) {
+    const state = await page.evaluate(() => window.__nhkRecorderState);
+    throw new Error(
+      `手話CGの先頭を検出できませんでした（現在時刻: ${state?.currentTime ?? '未取得'}）。`,
+      { cause: error },
+    );
+  }
 }
 
 async function recordCanvas(page) {
