@@ -1,12 +1,15 @@
 import { spawn } from 'node:child_process';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
-import { dirname, extname, resolve } from 'node:path';
+import { mkdir, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 const rootDir = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const RECORDING_DURATION_MS = 5_000;
-const RECORDING_FPS = 30;
+const OUTPUT_FPS = 30;
+const MAX_LOOP_SECONDS = 20;
+const FRAME_SETTLE_MS = 120;
+const VIEWPORT = { width: 1_280, height: 720 };
 const NAVIGATION_TIMEOUT_MS = 90_000;
 const PLAYER_TIMEOUT_MS = 60_000;
 const REGULAR_CHROME_USER_AGENT =
@@ -224,6 +227,22 @@ async function waitForAnimation(page) {
   try {
     await page.waitForFunction(
       () => {
+        const canvas = document.querySelector('#player-canvas');
+        return canvas && canvas.width > 400 && canvas.height > 400;
+      },
+      undefined,
+      { polling: 250, timeout: PLAYER_TIMEOUT_MS },
+    );
+  } catch (error) {
+    throw new Error('手話CGキャンバスの初期化が完了しませんでした。', { cause: error });
+  }
+
+  // Re-bind after Unity finishes booting; earlier hooks can be replaced.
+  await prepareAnimationTracking(page);
+
+  try {
+    await page.waitForFunction(
+      () => {
         Player.GetTotalTime();
         const totalTime = window.__nhkRecorderState?.totalTime;
         return totalTime && totalTime !== '00:00:00';
@@ -238,117 +257,164 @@ async function waitForAnimation(page) {
       { cause: error },
     );
   }
-
-  // Start at the beginning of a loop so repeated runs produce comparable clips.
-  try {
-    await page.waitForFunction(
-      () => {
-        Player.GetCurrentTime();
-        const value = window.__nhkRecorderState?.currentTime;
-        const parts = (value ?? '').split(':').map(Number);
-        if (parts.length < 2 || parts.some((part) => !Number.isFinite(part))) {
-          return false;
-        }
-
-        const seconds = parts.reduce((total, part) => total * 60 + part, 0);
-        return seconds <= 0.15;
-      },
-      undefined,
-      { polling: 50, timeout: PLAYER_TIMEOUT_MS },
-    );
-  } catch (error) {
-    const state = await page.evaluate(() => window.__nhkRecorderState);
-    throw new Error(
-      `手話CGの先頭を検出できませんでした（現在時刻: ${state?.currentTime ?? '未取得'}）。`,
-      { cause: error },
-    );
-  }
 }
 
-async function recordCanvas(page) {
-  return page.locator('#player-canvas').evaluate(
-    async (canvas, { durationMs, fps }) => {
-      const mimeType = [
-        'video/webm;codecs=vp9',
-        'video/webm;codecs=vp8',
-        'video/webm',
-      ].find((candidate) => MediaRecorder.isTypeSupported(candidate));
+async function captureCanvasFrames(page, framesDir) {
+  const saved = new Set();
 
-      if (!mimeType) {
-        throw new Error('このブラウザはWebM録画に対応していません。');
+  await page.exposeBinding('__nhkSaveFrame', async (_source, index, base64) => {
+    await writeFile(
+      join(framesDir, `frame-${String(index).padStart(4, '0')}.jpg`),
+      Buffer.from(base64, 'base64'),
+    );
+    saved.add(index);
+  });
+
+  // Real-time capture is impossible here: headless Chromium renders this Unity
+  // player with software GL at only a few frames per second, so wall-clock
+  // sampling produces frames seconds apart in the animation. Instead we pause
+  // and seek each frame with Player.SetCurrentFrame, which is deterministic and
+  // independent of render speed, then rebuild an evenly timed clip.
+  const result = await page.locator('#player-canvas').evaluate(
+    async (canvas, { outputFps, settleMs, maxSeconds }) => {
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const waitRender = () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        );
+
+      const parseTime = (value) => {
+        if (value === null || value === undefined) return 0;
+        const text = String(value);
+        const parts = text.split(':');
+        if (parts.length === 3) {
+          return Number(parts[0]) * 3600 + Number(parts[1]) * 60 + parseFloat(parts[2]);
+        }
+        if (parts.length === 2) {
+          return Number(parts[0]) * 60 + parseFloat(parts[1]);
+        }
+        return parseFloat(text) || 0;
+      };
+
+      const readCurrentSeconds = async () => {
+        Player.GetCurrentTime();
+        await sleep(60);
+        return parseTime(window.__nhkRecorderState?.currentTime);
+      };
+
+      const captureBase64 = () =>
+        new Promise((resolve, reject) => {
+          canvas.toBlob(
+            async (blob) => {
+              if (!blob) {
+                reject(new Error('キャンバスの画像化に失敗しました。'));
+                return;
+              }
+              const buffer = new Uint8Array(await blob.arrayBuffer());
+              let binary = '';
+              const blockSize = 0x8000;
+              for (let offset = 0; offset < buffer.length; offset += blockSize) {
+                binary += String.fromCharCode(...buffer.subarray(offset, offset + blockSize));
+              }
+              resolve(btoa(binary));
+            },
+            'image/jpeg',
+            0.9,
+          );
+        });
+
+      Player.Pause();
+      await sleep(200);
+
+      Player.GetTotalTime();
+      await sleep(80);
+      const totalSeconds = parseTime(window.__nhkRecorderState?.totalTime);
+
+      // Derive the source frame rate from a probe seek (frame -> reported time).
+      const probeFrame = 24;
+      Player.SetCurrentFrame(probeFrame);
+      await waitRender();
+      await sleep(settleMs);
+      const probeSeconds = await readCurrentSeconds();
+      let sourceFps = probeSeconds > 0 ? probeFrame / probeSeconds : outputFps;
+      if (!Number.isFinite(sourceFps) || sourceFps < 5 || sourceFps > 120) {
+        sourceFps = 60;
       }
 
-      const stream = canvas.captureStream(fps);
-      const chunks = [];
-      const recorder = new MediaRecorder(stream, {
-        mimeType,
-        videoBitsPerSecond: 4_000_000,
-      });
+      const cappedSeconds = Math.min(totalSeconds, maxSeconds);
+      const sourceFrames = Math.max(2, Math.round(cappedSeconds * sourceFps));
+      const outputCount = Math.max(2, Math.round(cappedSeconds * outputFps));
 
-      const recording = new Promise((resolvePromise, reject) => {
-        recorder.addEventListener('dataavailable', (event) => {
-          if (event.data.size > 0) {
-            chunks.push(event.data);
-          }
-        });
-        recorder.addEventListener('error', () => {
-          reject(recorder.error ?? new Error('ブラウザでの録画に失敗しました。'));
-        });
-        recorder.addEventListener('stop', async () => {
-          try {
-            const blob = new Blob(chunks, { type: mimeType });
-            const bytes = new Uint8Array(await blob.arrayBuffer());
-            let binary = '';
-            const blockSize = 32_768;
+      for (let index = 0; index < outputCount; index += 1) {
+        let sourceFrame = Math.round((index * sourceFps) / outputFps);
+        if (sourceFrame >= sourceFrames) {
+          sourceFrame = sourceFrames - 1;
+        }
 
-            for (let offset = 0; offset < bytes.length; offset += blockSize) {
-              binary += String.fromCharCode(...bytes.subarray(offset, offset + blockSize));
-            }
+        Player.SetCurrentFrame(sourceFrame);
+        await waitRender();
+        await sleep(settleMs);
 
-            resolvePromise(btoa(binary));
-          } catch (error) {
-            reject(error);
-          } finally {
-            stream.getTracks().forEach((track) => track.stop());
-          }
-        });
-      });
+        const base64 = await captureBase64();
+        await window.__nhkSaveFrame(index, base64);
+      }
 
-      recorder.start(1_000);
-      setTimeout(() => recorder.stop(), durationMs + 250);
-      return recording;
+      return {
+        width: canvas.width,
+        height: canvas.height,
+        frameCount: outputCount,
+        sourceFps,
+        totalSeconds,
+      };
     },
-    { durationMs: RECORDING_DURATION_MS, fps: RECORDING_FPS },
+    { outputFps: OUTPUT_FPS, settleMs: FRAME_SETTLE_MS, maxSeconds: MAX_LOOP_SECONDS },
   );
+
+  if (saved.size !== result.frameCount) {
+    throw new Error(
+      `フレーム数が不足しています（${saved.size}/${result.frameCount}）。`,
+    );
+  }
+
+  return result;
 }
 
-async function normalizeRecording(inputPath, outputPath) {
-  await run('ffmpeg', [
-    '-y',
-    '-v',
-    'error',
-    '-i',
-    inputPath,
-    '-an',
-    '-vf',
-    `fps=${RECORDING_FPS},tpad=stop_mode=clone:stop_duration=5,trim=duration=5,setpts=PTS-STARTPTS`,
-    '-frames:v',
-    String((RECORDING_DURATION_MS / 1_000) * RECORDING_FPS),
-    '-c:v',
-    'libvpx-vp9',
-    '-crf',
-    '18',
-    '-b:v',
-    '0',
-    '-row-mt',
-    '1',
-    outputPath,
-  ]);
+async function encodeFrames(framesDir, outputPath, frameCount) {
+  const temporaryOutput = `${outputPath}.${process.pid}.${Date.now()}.tmp.webm`;
+
+  try {
+    await run('ffmpeg', [
+      '-y',
+      '-v',
+      'error',
+      '-framerate',
+      String(OUTPUT_FPS),
+      '-i',
+      join(framesDir, 'frame-%04d.jpg'),
+      '-an',
+      '-frames:v',
+      String(frameCount),
+      '-c:v',
+      'libvpx-vp9',
+      '-crf',
+      '18',
+      '-b:v',
+      '0',
+      '-row-mt',
+      '1',
+      temporaryOutput,
+    ]);
+
+    await rm(outputPath, { force: true });
+    await rename(temporaryOutput, outputPath);
+  } finally {
+    await rm(temporaryOutput, { force: true });
+  }
 }
 
 async function recordSign({ word, output, result }) {
   const outputPath = outputPathFor(word, output);
-  const temporaryPath = `${outputPath}.${process.pid}.${Date.now()}.raw.webm`;
+  const framesDir = await mkdtemp(join(tmpdir(), 'shuwa-nhk-frames-'));
   const searchUrl = new URL(
     'https://www.nhk.or.jp/strl/signlanguagecg/searchJSL/keyword.html',
   );
@@ -360,11 +426,25 @@ async function recordSign({ word, output, result }) {
   try {
     browser = await launchBrowser();
     const context = await browser.newContext({
-      viewport: { width: 1_280, height: 720 },
+      viewport: VIEWPORT,
       userAgent: REGULAR_CHROME_USER_AGENT,
     });
     const page = await context.newPage();
     page.setDefaultTimeout(PLAYER_TIMEOUT_MS);
+
+    // Force Unity's WebGL context to keep the drawing buffer so toBlob can read frames.
+    await page.addInitScript(() => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function getContext(type, attributes) {
+        if (type === 'webgl' || type === 'experimental-webgl' || type === 'webgl2') {
+          return original.call(this, type, {
+            ...(attributes || {}),
+            preserveDrawingBuffer: true,
+          });
+        }
+        return original.call(this, type, attributes);
+      };
+    });
 
     await page.goto(searchUrl.href, {
       waitUntil: 'domcontentloaded',
@@ -376,16 +456,14 @@ async function recordSign({ word, output, result }) {
     await selected.locator.click();
     await page.locator('#playrbox.is-active').waitFor({ state: 'visible' });
     await waitForAnimation(page);
-
-    const base64Recording = await recordCanvas(page);
-    await writeFile(temporaryPath, Buffer.from(base64Recording, 'base64'));
+    const capture = await captureCanvasFrames(page, framesDir);
     await context.close();
+    await encodeFrames(framesDir, outputPath, capture.frameCount);
 
-    await normalizeRecording(temporaryPath, outputPath);
-    return { outputPath, selected };
+    return { outputPath, selected, capture };
   } finally {
     await browser?.close();
-    await rm(temporaryPath, { force: true });
+    await rm(framesDir, { recursive: true, force: true });
   }
 }
 
@@ -397,9 +475,11 @@ async function main() {
       return;
     }
 
-    const { outputPath, selected } = await recordSign(options);
+    const { outputPath, selected, capture } = await recordSign(options);
+    const seconds = (capture.frameCount / OUTPUT_FPS).toFixed(2);
     process.stdout.write(
-      `録画しました: ${selected.title}（${selected.caption}）\n${outputPath}\n`,
+      `録画しました: ${selected.title}（${selected.caption}）` +
+        ` / ${capture.frameCount}フレーム ${seconds}秒 @${OUTPUT_FPS}fps\n${outputPath}\n`,
     );
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n\n`);

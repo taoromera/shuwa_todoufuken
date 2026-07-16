@@ -26,10 +26,10 @@
 
 #### NHK手話CGを録画する
 
-Playwright用のChromiumとffmpegを用意すると、指定した単語の手話CGを5秒間のWebM動画として録画できます。
+Playwright用のChromiumとffmpegを用意すると、指定した単語の手話CGをアニメーション1ループ分のWebM動画（30fps）として録画できます。手話CGを1フレームずつ静止させて取得するため、書き出しには数分かかります。
 
 ```bash
-npx playwright install chromium
+npx playwright install chromium ffmpeg
 npm run record:sign -- "作る"
 ```
 
@@ -40,7 +40,7 @@ npm run record:sign -- "作る" --output videos/tsukuru.webm
 npm run record:sign -- "作る" --result 2
 ```
 
-録画はNHKの検索結果から完全一致する単語を優先し、該当しない場合は最初の結果を使います。`--result` は検索結果の1番目を `1` として指定します。個人学習の範囲で利用し、NHKサイトの利用条件と著作権を確認してください。
+録画はNHKの検索結果から完全一致する単語を優先し、該当しない場合は最初の結果を使います。`--result` は検索結果の1番目を `1` として指定します。出力はアニメーション1ループ分（30fps）で、同名の出力ファイルがある場合は上書きします。個人学習の範囲で利用し、NHKサイトの利用条件と著作権を確認してください。
 
 ### 2. 開発サーバー
 
