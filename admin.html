@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a365d" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>個人用 · 手話SRS</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/manage.css" />
+    <link rel="stylesheet" href="/src/admin.css" />
+  </head>
+  <body>
+    <div id="app" class="admin-app">
+      <header class="header">
+        <h1>個人用フラッシュカード</h1>
+        <p class="subtitle">クラス向けホームとは別。SRSで自分用のカードを復習します。</p>
+      </header>
+
+      <nav class="mode-tabs admin-section-tabs" role="tablist" aria-label="管理セクション">
+        <button
+          type="button"
+          class="mode-tab active"
+          data-section="review"
+          role="tab"
+          aria-selected="true"
+        >
+          SRS復習
+        </button>
+        <button
+          type="button"
+          class="mode-tab"
+          data-section="manage"
+          role="tab"
+          aria-selected="false"
+        >
+          カード管理
+        </button>
+      </nav>
+
+      <section id="review-section" class="admin-section">
+        <div class="srs-stats" id="srs-stats" aria-live="polite"></div>
+
+        <nav class="mode-tabs" role="tablist" aria-label="復習モード">
+          <button
+            type="button"
+            class="mode-tab active"
+            data-mode="sign-to-word"
+            role="tab"
+            aria-selected="true"
+          >
+            手話 → 言葉
+          </button>
+          <button
+            type="button"
+            class="mode-tab"
+            data-mode="word-to-sign"
+            role="tab"
+            aria-selected="false"
+          >
+            言葉 → 手話
+          </button>
+        </nav>
+
+        <main class="quiz-card" id="quiz-card">
+          <div class="prompt-row">
+            <p class="prompt" id="prompt">手話を見て、言葉を思い出してみましょう。</p>
+            <p class="card-counter" id="card-counter" hidden></p>
+          </div>
+
+          <div class="question-area" id="question-area"></div>
+
+          <button type="button" class="btn btn-reveal" id="reveal-btn" hidden>
+            答えを見る
+          </button>
+
+          <div class="answer-area" id="answer-area" hidden></div>
+
+          <div class="srs-ratings" id="srs-ratings" hidden>
+            <button type="button" class="btn btn-srs btn-srs-again" data-rating="again">
+              もう一度
+            </button>
+            <button type="button" class="btn btn-srs btn-srs-hard" data-rating="hard">
+              むずかしい
+            </button>
+            <button type="button" class="btn btn-srs btn-srs-good" data-rating="good">
+              できた
+            </button>
+            <button type="button" class="btn btn-srs btn-srs-easy" data-rating="easy">
+              かんたん
+            </button>
+          </div>
+        </main>
+      </section>
+
+      <section id="manage-section" class="admin-section" hidden>
+        <p class="manage-status" id="status" role="status" aria-live="polite"></p>
+
+        <section class="manage-card" aria-labelledby="word-list-heading">
+          <div class="manage-card-header">
+            <h2 class="manage-card-title" id="word-list-heading">個人用カード</h2>
+            <span class="manage-count" id="word-count"></span>
+          </div>
+          <ul class="word-list" id="word-list"></ul>
+          <p class="empty-message" id="empty-message" hidden>まだカードがありません。</p>
+        </section>
+
+        <section class="manage-card" aria-labelledby="add-word-heading">
+          <h2 class="manage-card-title" id="add-word-heading">カードを追加</h2>
+
+          <div class="video-field">
+            <label class="field-label" for="video-input">元の動画</label>
+            <input class="file-input" id="video-input" type="file" accept="video/*" />
+            <p class="field-help">
+              追加時に動画を処理して videos フォルダへ保存し、カードは
+              src/data/admin-words.js に書き込みます（npm run dev が必要）。
+            </p>
+          </div>
+
+          <form class="manual-form" id="manual-form">
+            <label class="field-label" for="manual-title">言葉</label>
+            <input class="text-input" id="manual-title" required />
+
+            <label class="field-label" for="manual-caption">ひらがな</label>
+            <input class="text-input" id="manual-caption" required />
+
+            <button class="btn btn-add" type="submit">追加</button>
+          </form>
+        </section>
+      </section>
+    </div>
+
+    <div class="completion-modal" id="completion-modal" hidden>
+      <div
+        class="completion-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="completion-title"
+      >
+        <h2 class="completion-title" id="completion-title">今日の復習完了</h2>
+        <p class="completion-message" id="completion-message">
+          期限のカードをすべて復習しました。
+        </p>
+        <button type="button" class="btn btn-next" id="completion-ok-btn">OK</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

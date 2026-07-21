@@ -3,6 +3,8 @@ import {
   formatLessonLabel,
   getLessonsWithWords,
 } from './data/lessons.js';
+import { showQuizVideo } from './quiz-video.js';
+
 const MODES = {
   SIGN_TO_WORD: 'sign-to-word',
   WORD_TO_SIGN: 'word-to-sign',
@@ -45,8 +47,13 @@ const slots = {
   emptyMessage: document.createElement('p'),
 };
 
+function getLessonWords() {
+  // Class home: only lesson cards. Personal/admin cards live on /admin.
+  return getWords().filter((word) => word.lesson != null);
+}
+
 function getActiveWords() {
-  const words = getWords();
+  const words = getLessonWords();
 
   if (state.selectedLessonId === ALL_LESSONS) {
     return words;
@@ -56,7 +63,7 @@ function getActiveWords() {
 }
 
 function countWordsForLesson(lessonId) {
-  return getWords().filter((word) => word.lesson === lessonId).length;
+  return getLessonWords().filter((word) => word.lesson === lessonId).length;
 }
 
 function populateLessonSelect() {
@@ -67,7 +74,7 @@ function populateLessonSelect() {
   allOption.textContent = 'すべてのレッスン';
   elements.lessonSelect.appendChild(allOption);
 
-  for (const lesson of getLessonsWithWords(getWords())) {
+  for (const lesson of getLessonsWithWords(getLessonWords())) {
     const wordCount = countWordsForLesson(lesson.id);
     const option = document.createElement('option');
     option.value = String(lesson.id);
@@ -169,43 +176,11 @@ function renderWordCard(word, { label = null } = {}) {
   return card;
 }
 
-function renderVideo(word, { autoplay = true, controls = true, loop = true } = {}) {
-  const video = document.createElement('video');
-  video.className = 'quiz-video';
-  video.src = word.video;
-  video.playsInline = true;
-  video.controls = controls;
-  video.preload = 'auto';
-  video.setAttribute('aria-label', `${word.title}の手話動画`);
-
-  if (autoplay) {
-    video.autoplay = true;
-    video.muted = true;
-  }
-
-  if (loop) {
-    video.loop = true;
-  }
-
-  return video;
-}
-
-function renderMissingVideo(word) {
-  const missing = document.createElement('p');
-  missing.className = 'missing-video';
-  missing.textContent = `「${word.title}」の動画（${word.video}）がまだありません。`;
-  return missing;
-}
-
-function showVideoIn(target, word) {
-  target.replaceChildren();
-
-  if (!state.availableVideos.has(word.video)) {
-    target.appendChild(renderMissingVideo(word));
-    return;
-  }
-
-  target.appendChild(renderVideo(word));
+function showVideoIn(target, word, { hideLabel = false } = {}) {
+  showQuizVideo(target, word, {
+    isAvailable: state.availableVideos.has(word.video),
+    hideLabel,
+  });
 }
 
 function renderQuestion() {
@@ -223,7 +198,7 @@ function renderQuestion() {
 
   if (state.mode === MODES.SIGN_TO_WORD) {
     slots.questionMedia.hidden = false;
-    showVideoIn(slots.questionMedia, state.current);
+    showVideoIn(slots.questionMedia, state.current, { hideLabel: true });
     return;
   }
 

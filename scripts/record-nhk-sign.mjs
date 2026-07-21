@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
+import { cropFilterForSize } from '../src/video-crop.js';
 
 const rootDir = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const OUTPUT_FPS = 30;
@@ -158,14 +158,24 @@ async function launchBrowser() {
 
 async function selectSearchResult(page, word, requestedResult) {
   const resultLinks = page.locator('#searchResult > a');
-  await page.waitForFunction(
-    () => {
-      const count = document.querySelector('#search_count')?.textContent?.trim();
-      return count && count !== '00件';
-    },
-    undefined,
-    { polling: 250, timeout: PLAYER_TIMEOUT_MS },
-  );
+  try {
+    await page.waitForFunction(
+      () => {
+        const count = document.querySelector('#search_count')?.textContent?.trim();
+        return Boolean(count) && count !== '検索中';
+      },
+      undefined,
+      { polling: 250, timeout: PLAYER_TIMEOUT_MS },
+    );
+  } catch (error) {
+    throw new Error(`「${word}」の検索結果を取得できませんでした。`, { cause: error });
+  }
+
+  const countText =
+    (await page.locator('#search_count').textContent())?.trim() ?? '';
+  if (countText === '00件' || countText.startsWith('0件')) {
+    throw new Error(`「${word}」に一致する手話CGが見つかりませんでした。`);
+  }
 
   const results = await resultLinks.evaluateAll((links) =>
     links.map((link) => ({
@@ -379,8 +389,10 @@ async function captureCanvasFrames(page, framesDir) {
   return result;
 }
 
-async function encodeFrames(framesDir, outputPath, frameCount) {
+async function encodeFrames(framesDir, outputPath, frameCount, { width, height } = {}) {
   const temporaryOutput = `${outputPath}.${process.pid}.${Date.now()}.tmp.webm`;
+  const cropFilter =
+    width && height ? `${cropFilterForSize(width, height)},` : '';
 
   try {
     await run('ffmpeg', [
@@ -391,17 +403,25 @@ async function encodeFrames(framesDir, outputPath, frameCount) {
       String(OUTPUT_FPS),
       '-i',
       join(framesDir, 'frame-%04d.jpg'),
+      '-vf',
+      `${cropFilter}fps=${OUTPUT_FPS}`,
       '-an',
       '-frames:v',
       String(frameCount),
       '-c:v',
       'libvpx-vp9',
+      '-pix_fmt',
+      'yuv420p',
       '-crf',
       '18',
       '-b:v',
       '0',
       '-row-mt',
       '1',
+      '-r',
+      String(OUTPUT_FPS),
+      '-fps_mode',
+      'cfr',
       temporaryOutput,
     ]);
 
@@ -458,7 +478,10 @@ async function recordSign({ word, output, result }) {
     await waitForAnimation(page);
     const capture = await captureCanvasFrames(page, framesDir);
     await context.close();
-    await encodeFrames(framesDir, outputPath, capture.frameCount);
+    await encodeFrames(framesDir, outputPath, capture.frameCount, {
+      width: capture.width,
+      height: capture.height,
+    });
 
     return { outputPath, selected, capture };
   } finally {

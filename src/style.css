@@ -183,6 +183,32 @@ body {
   min-height: 0;
 }
 
+.answer-area[hidden] {
+  display: none;
+}
+
+.quiz-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 538 / 510;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #000;
+}
+
+.quiz-video-frame .quiz-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+  background: #000;
+  object-fit: contain;
+}
+
+.quiz-video-frame--cropped .quiz-video {
+  vertical-align: top;
+}
+
 .quiz-video {
   width: 100%;
   border-radius: var(--radius);

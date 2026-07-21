@@ -1,5 +1,6 @@
 import { LESSONS, formatLessonLabel } from './data/lessons.js';
 import { videoFileNameFromReading } from './data/romanize.js';
+import { getAdminWords } from './data/admin-word-store.js';
 import {
   addWord,
   getWordId,
@@ -185,7 +186,7 @@ async function handleManualAdd(event) {
   }
 
   const caption = document.getElementById('manual-caption').value.trim();
-  const fileName = videoFileNameFromReading(caption, words);
+  const fileName = videoFileNameFromReading(caption, [...words, ...getAdminWords()]);
   const word = {
     id: crypto.randomUUID(),
     lesson: lessonId,
