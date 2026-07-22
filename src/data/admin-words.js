@@ -165,10 +165,10 @@ export const ADMIN_WORDS = [
     video: './videos/isogashii.webm',
   },
   {
-    title: '一',
-    caption: 'いち',
+    title: '一月',
+    caption: 'いちがつ',
     id: 'ab66fdd5-05cb-4f17-a71d-3ebc20684ef8',
-    video: './videos/ichi.webm',
+    video: './videos/ichigatsu.webm',
   },
   {
     title: 'いつ',
