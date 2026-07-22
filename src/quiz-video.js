@@ -1,9 +1,7 @@
-import { needsLabelCrop, scaledBottomCropPixels } from './video-crop.js';
+import { needsLabelCrop } from './video-crop.js';
 
-function applyLabelCrop(frame, video) {
-  const bottom = scaledBottomCropPixels(video.videoHeight);
+function applyLabelCrop(frame) {
   frame.classList.add('quiz-video-frame--cropped');
-  frame.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight - bottom}`;
 }
 
 export function renderQuizVideo(
@@ -42,7 +40,7 @@ export function renderQuizVideo(
       'loadedmetadata',
       () => {
         if (needsLabelCrop(video.videoWidth, video.videoHeight)) {
-          applyLabelCrop(frame, video);
+          applyLabelCrop(frame);
         }
       },
       { once: true },

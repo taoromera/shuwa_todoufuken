@@ -190,7 +190,6 @@ body {
 .quiz-video-frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 538 / 510;
   overflow: hidden;
   border-radius: var(--radius);
   background: #000;

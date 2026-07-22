@@ -390,46 +390,76 @@ async function captureCanvasFrames(page, framesDir) {
   return result;
 }
 
+async function encodeVp9(inputArgs, outputPath, { videoFilter, frameCount } = {}) {
+  const args = [
+    '-y',
+    '-v',
+    'error',
+    ...inputArgs,
+  ];
+
+  if (videoFilter) {
+    args.push('-vf', videoFilter);
+  }
+
+  args.push(
+    '-an',
+    '-c:v',
+    'libvpx-vp9',
+    '-pix_fmt',
+    'yuv420p',
+    '-crf',
+    '18',
+    '-b:v',
+    '0',
+    '-row-mt',
+    '1',
+    '-auto-alt-ref',
+    '0',
+    '-r',
+    String(OUTPUT_FPS),
+    '-fps_mode',
+    'cfr',
+  );
+
+  if (frameCount != null) {
+    args.push('-frames:v', String(frameCount));
+  }
+
+  args.push(outputPath);
+  await run('ffmpeg', args);
+}
+
 async function encodeFrames(framesDir, outputPath, frameCount, { width, height } = {}) {
   const temporaryOutput = `${outputPath}.${process.pid}.${Date.now()}.tmp.webm`;
+  const sanitizedOutput = `${outputPath}.${process.pid}.${Date.now()}.clean.webm`;
   const cropFilter =
     width && height ? `${cropFilterForSize(width, height)},` : '';
 
   try {
-    await run('ffmpeg', [
-      '-y',
-      '-v',
-      'error',
-      '-framerate',
-      String(OUTPUT_FPS),
-      '-i',
-      join(framesDir, 'frame-%04d.jpg'),
-      '-vf',
-      `${cropFilter}fps=${OUTPUT_FPS}`,
-      '-an',
-      '-frames:v',
-      String(frameCount),
-      '-c:v',
-      'libvpx-vp9',
-      '-pix_fmt',
-      'yuv420p',
-      '-crf',
-      '18',
-      '-b:v',
-      '0',
-      '-row-mt',
-      '1',
-      '-r',
-      String(OUTPUT_FPS),
-      '-fps_mode',
-      'cfr',
+    // First pass: JPEG sequence -> VP9 (may produce Chrome-hostile bitstreams).
+    await encodeVp9(
+      [
+        '-framerate',
+        String(OUTPUT_FPS),
+        '-i',
+        join(framesDir, 'frame-%04d.jpg'),
+      ],
       temporaryOutput,
-    ]);
+      {
+        videoFilter: `${cropFilter}fps=${OUTPUT_FPS}`,
+        frameCount,
+      },
+    );
+
+    // Second pass: remux through a clean CFR re-encode so Chrome can decode it.
+    await encodeVp9(['-i', temporaryOutput], sanitizedOutput);
 
     await rm(outputPath, { force: true });
-    await rename(temporaryOutput, outputPath);
+    await rename(sanitizedOutput, outputPath);
   } finally {
     await rm(temporaryOutput, { force: true });
+    await rm(sanitizedOutput, { force: true });
   }
 }
 
