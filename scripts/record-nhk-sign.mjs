@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright';
 import { cropFilterForSize } from '../src/video-crop.js';
 
 const rootDir = resolve(fileURLToPath(new URL('..', import.meta.url)));
