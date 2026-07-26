@@ -10,7 +10,7 @@ import {
 import {
   buildReviewQueue,
   countSrsStats,
-  formatDueLabel,
+  formatEaseLabel,
   getSrsEntry,
   removeSrsEntry,
   reviewCard,
@@ -107,16 +107,16 @@ function renderSrsStats() {
 
   elements.srsStats.innerHTML = `
     <div class="srs-stat">
-      <span class="srs-stat-value">${stats.due}</span>
-      <span class="srs-stat-label">今日の復習</span>
+      <span class="srs-stat-value">${stats.total}</span>
+      <span class="srs-stat-label">カード</span>
     </div>
     <div class="srs-stat">
       <span class="srs-stat-value">${stats.new}</span>
       <span class="srs-stat-label">新規</span>
     </div>
     <div class="srs-stat">
-      <span class="srs-stat-value">${stats.later}</span>
-      <span class="srs-stat-label">あとで</span>
+      <span class="srs-stat-value">${stats.hard}</span>
+      <span class="srs-stat-label">にがて</span>
     </div>
   `;
 }
@@ -238,11 +238,7 @@ function scrollToBottom() {
 function showCompletionModal() {
   srsLog('showCompletionModal');
   pauseVideos();
-  const stats = countSrsStats(getPlayableWords(), getAdminWordId);
-  elements.completionMessage.textContent =
-    stats.later > 0
-      ? `今日の分は完了です。あと ${stats.later} 枚は予定日まで待ちます。`
-      : '期限のカードをすべて復習しました。';
+  elements.completionMessage.textContent = `${state.queue.length} 枚を1周しました。OKでにがて順にもう1周始めます。`;
   elements.completionModal.hidden = false;
   elements.completionOkBtn.focus();
 }
@@ -279,10 +275,7 @@ function loadQuestion() {
   if (state.queue.length === 0) {
     srsLog('loadQuestion:empty-queue');
     state.current = null;
-    elements.prompt.textContent =
-      state.words.length === 0
-        ? 'カードを追加してから復習を始めましょう。'
-        : '今日の復習はありません。';
+    elements.prompt.textContent = 'カードを追加してから復習を始めましょう。';
     renderQuestion();
     updateCounter();
     return;
@@ -462,7 +455,7 @@ function refreshManage() {
     text.innerHTML = `
       <p class="word-list-title">${word.title}</p>
       <p class="word-list-caption">${word.caption}</p>
-      <p class="word-list-meta">SRS: ${formatDueLabel(entry)}</p>
+      <p class="word-list-meta">${formatEaseLabel(entry)}</p>
     `;
 
     const removeBtn = document.createElement('button');
@@ -565,7 +558,7 @@ async function init() {
   setupViewSlots();
   bindEvents();
   setRatingButtonsEnabled(false);
-  setStatus('カードの追加・削除は src/data/admin-words.js に保存されます。SRS進捗はこのブラウザに保存されます。');
+  setStatus('カードの追加・削除は src/data/admin-words.js に保存されます。習熟度はこのブラウザに保存されます。');
   await beginReview();
 }
 

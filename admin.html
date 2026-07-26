@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#1a365d" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>個人用 · 手話SRS</title>
+    <title>個人用 · 手話フラッシュカード</title>
     <link rel="stylesheet" href="/src/style.css" />
     <link rel="stylesheet" href="/src/manage.css" />
     <link rel="stylesheet" href="/src/admin.css" />
@@ -14,7 +14,7 @@
     <div id="app" class="admin-app">
       <header class="header">
         <h1>個人用フラッシュカード</h1>
-        <p class="subtitle">クラス向けホームとは別。SRSで自分用のカードを復習します。</p>
+        <p class="subtitle">クラス向けホームとは別。にがてなカードから順にエンドレスで復習します。</p>
       </header>
 
       <nav class="mode-tabs admin-section-tabs" role="tablist" aria-label="管理セクション">
@@ -25,7 +25,7 @@
           role="tab"
           aria-selected="true"
         >
-          SRS復習
+          復習
         </button>
         <button
           type="button"
@@ -78,16 +78,10 @@
 
           <div class="srs-ratings" id="srs-ratings" hidden>
             <button type="button" class="btn btn-srs btn-srs-again" data-rating="again">
-              もう一度
-            </button>
-            <button type="button" class="btn btn-srs btn-srs-hard" data-rating="hard">
-              むずかしい
-            </button>
-            <button type="button" class="btn btn-srs btn-srs-good" data-rating="good">
-              できた
+              忘れていた
             </button>
             <button type="button" class="btn btn-srs btn-srs-easy" data-rating="easy">
-              かんたん
+              覚えていた
             </button>
           </div>
         </main>
@@ -137,9 +131,9 @@
         aria-modal="true"
         aria-labelledby="completion-title"
       >
-        <h2 class="completion-title" id="completion-title">今日の復習完了</h2>
+        <h2 class="completion-title" id="completion-title">1周完了</h2>
         <p class="completion-message" id="completion-message">
-          期限のカードをすべて復習しました。
+          すべてのカードを1周しました。
         </p>
         <button type="button" class="btn btn-next" id="completion-ok-btn">OK</button>
       </div>

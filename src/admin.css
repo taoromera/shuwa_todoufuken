@@ -57,14 +57,6 @@
   background: #9a3412;
 }
 
-.btn-srs-hard {
-  background: #b45309;
-}
-
-.btn-srs-good {
-  background: #15803d;
-}
-
 .btn-srs-easy {
   background: #1d4ed8;
 }
@@ -73,10 +65,4 @@
   margin: 4px 0 0;
   color: var(--muted);
   font-size: 0.78rem;
-}
-
-@media (min-width: 480px) {
-  .srs-ratings {
-    grid-template-columns: repeat(4, 1fr);
-  }
 }
