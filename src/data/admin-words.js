@@ -471,12 +471,6 @@ export const ADMIN_WORDS = [
     video: './videos/gifu.webm',
   },
   {
-    title: '九',
-    caption: 'きゅう',
-    id: '24b2a41e-5a22-4889-93ad-183b74daaacf',
-    video: './videos/kyuu.webm',
-  },
-  {
     title: '牛乳',
     caption: 'ぎゅうにゅう',
     id: 'fac43bcc-2218-4474-ae1e-1ec204a87b5e',
@@ -555,12 +549,6 @@ export const ADMIN_WORDS = [
     video: './videos/genki.webm',
   },
   {
-    title: '五',
-    caption: 'ご',
-    id: 'bbad1811-cf58-4c29-be8f-cd846b2435c6',
-    video: './videos/go.webm',
-  },
-  {
     title: '公園',
     caption: 'こうえん',
     id: 'cf7ca957-2516-4cb2-ae21-b031a74dd95b',
@@ -633,12 +621,6 @@ export const ADMIN_WORDS = [
     video: './videos/sayounara.webm',
   },
   {
-    title: '三',
-    caption: 'さん',
-    id: '8b2d3c91-cf35-4cec-b341-c2db377a66c2',
-    video: './videos/san.webm',
-  },
-  {
     title: '滋賀県',
     caption: 'しがけん',
     id: '8be9c13b-a31a-4d67-a4e4-61f29850639a',
@@ -679,12 +661,6 @@ export const ADMIN_WORDS = [
     caption: 'しゅう',
     id: '1a49b2cc-d130-434c-80a5-fc167cf8d9e2',
     video: './videos/shuu.webm',
-  },
-  {
-    title: '十',
-    caption: 'じゅう',
-    id: '6d5f2347-98f4-4aa8-9c20-6aa752ec38b3',
-    video: './videos/juu.webm',
   },
   {
     title: '白',
@@ -811,6 +787,12 @@ export const ADMIN_WORDS = [
     caption: 'ちばけん',
     id: 'ffd5d8e0-46ca-45a4-b297-f80448df19f4',
     video: './videos/chiba.webm',
+  },
+  {
+    title: '昼食',
+    caption: 'ちゅうしょく',
+    id: '401357bd-3e9c-4791-a2f5-7ca9cb09875e',
+    video: './videos/hiru.webm',
   },
   {
     title: '使う',
@@ -999,12 +981,6 @@ export const ADMIN_WORDS = [
     video: './videos/naze.webm',
   },
   {
-    title: '七',
-    caption: 'なな',
-    id: '375eb788-cf49-4eb0-8450-4a9798acaf31',
-    video: './videos/nana.webm',
-  },
-  {
     title: '何',
     caption: 'なに',
     id: '25e23b6f-1f18-4bec-b4bd-7d1bad8c308c',
@@ -1023,12 +999,6 @@ export const ADMIN_WORDS = [
     video: './videos/nara.webm',
   },
   {
-    title: '二',
-    caption: 'に',
-    id: '2a35c597-51af-4258-af82-bb30237feb5f',
-    video: './videos/ni.webm',
-  },
-  {
     title: '新潟県',
     caption: 'にいがたけん',
     id: 'aaa7b241-4eb0-4cd3-9e9e-2a94c6cb3011',
@@ -1045,12 +1015,6 @@ export const ADMIN_WORDS = [
     caption: 'ねる',
     id: '81225a82-17e1-4139-b6c6-5b64204bf424',
     video: './videos/neru.webm',
-  },
-  {
-    title: 'はい',
-    caption: 'はい',
-    id: 'a597ba3c-be9a-4bd2-8c84-830b037af688',
-    video: './videos/hai.webm',
   },
   {
     title: '入る',
@@ -1081,12 +1045,6 @@ export const ADMIN_WORDS = [
     caption: 'はたらく',
     id: '71fb0711-c7e7-4047-b6f6-c0225a2490d4',
     video: './videos/hataraku.webm',
-  },
-  {
-    title: '八',
-    caption: 'はち',
-    id: '77aa71b9-2205-43f0-a31c-e3b570b35829',
-    video: './videos/hachi.webm',
   },
   {
     title: '話す',
@@ -1125,12 +1083,6 @@ export const ADMIN_WORDS = [
     video: './videos/hima.webm',
   },
   {
-    title: '百',
-    caption: 'ひゃく',
-    id: '5a0a19d8-7e4b-427a-b58f-a5190a701407',
-    video: './videos/hyaku.webm',
-  },
-  {
     title: '病院',
     caption: 'びょういん',
     id: '3001bdcf-e91a-421d-ad28-91c5fa513209',
@@ -1141,12 +1093,6 @@ export const ADMIN_WORDS = [
     caption: 'ひょうごけん',
     id: 'b7792ffb-3c85-4990-8111-bff9d68515c3',
     video: './videos/hyougo.webm',
-  },
-  {
-    title: '昼',
-    caption: 'ひる',
-    id: '401357bd-3e9c-4791-a2f5-7ca9cb09875e',
-    video: './videos/hiru.webm',
   },
   {
     title: '広島県',
@@ -1357,18 +1303,6 @@ export const ADMIN_WORDS = [
     caption: 'よる',
     id: '2d69134e-66fb-4bb9-ad36-3c734498ce9b',
     video: './videos/yoru.webm',
-  },
-  {
-    title: '四',
-    caption: 'よん',
-    id: '3a9c3beb-c5f6-462d-b19f-5fdb0bc75ada',
-    video: './videos/yon.webm',
-  },
-  {
-    title: '六',
-    caption: 'ろく',
-    id: '1b32cb4a-5b01-441f-b5ab-37a6d9232c37',
-    video: './videos/roku.webm',
   },
   {
     title: '和歌山県',
