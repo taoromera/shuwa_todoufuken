@@ -12,9 +12,12 @@ import {
   countSrsStats,
   formatEaseLabel,
   getSrsEntry,
+  MIN_EASE,
   removeSrsEntry,
   reviewCard,
+  seedEaseOnce,
 } from './data/srs-store.js';
+import { ADMIN_BATCH_200_IDS } from './data/admin-batch-200.js';
 import { showQuizVideo } from './quiz-video.js';
 
 const MODES = {
@@ -558,7 +561,12 @@ async function init() {
   setupViewSlots();
   bindEvents();
   setRatingButtonsEnabled(false);
-  setStatus('カードの追加・削除は src/data/admin-words.js に保存されます。習熟度はこのブラウザに保存されます。');
+  const seeded = seedEaseOnce(ADMIN_BATCH_200_IDS, MIN_EASE);
+  setStatus(
+    seeded > 0
+      ? `新しい${seeded}枚のカードを習熟度 ${MIN_EASE.toFixed(1)} で登録しました。習熟度はこのブラウザに保存されます。`
+      : 'カードの追加・削除は src/data/admin-words.js に保存されます。習熟度はこのブラウザに保存されます。',
+  );
   await beginReview();
 }
 

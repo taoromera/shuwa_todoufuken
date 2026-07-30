@@ -6,9 +6,10 @@
  */
 
 const STORAGE_KEY = 'shuwa-admin-srs-v1';
+const BATCH_200_SEED_KEY = 'shuwa-admin-srs-seed-batch-200-v1';
 
 const DEFAULT_EASE = 2.5;
-const MIN_EASE = 1.3;
+export const MIN_EASE = 1.2;
 
 export const RATINGS = {
   AGAIN: 'again',
@@ -105,6 +106,32 @@ export function removeSrsEntry(wordId) {
   if (!(wordId in map)) return;
   delete map[wordId];
   saveSrsMap(map);
+}
+
+/**
+ * One-time seed: set ease for the given word ids (e.g. a new batch).
+ * Skips if this seed key was already applied in this browser.
+ * Returns how many cards were written.
+ */
+export function seedEaseOnce(wordIds, ease = MIN_EASE, seedKey = BATCH_200_SEED_KEY) {
+  if (typeof localStorage === 'undefined') return 0;
+  if (localStorage.getItem(seedKey)) return 0;
+
+  const map = loadSrsMap();
+  const clamped = Math.max(MIN_EASE, ease);
+
+  for (const wordId of wordIds) {
+    const prev = map[wordId];
+    map[wordId] = {
+      ease: clamped,
+      reviews: prev?.reviews ?? 0,
+      lastReviewed: prev?.lastReviewed ?? null,
+    };
+  }
+
+  saveSrsMap(map);
+  localStorage.setItem(seedKey, '1');
+  return wordIds.length;
 }
 
 export function formatEaseLabel(entry) {
