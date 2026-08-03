@@ -157,8 +157,7 @@ async function launchBrowser() {
   }
 }
 
-async function selectSearchResult(page, word, requestedResult) {
-  const resultLinks = page.locator('#searchResult > a');
+async function waitForSearchResults(page, word) {
   try {
     await page.waitForFunction(
       () => {
@@ -171,6 +170,28 @@ async function selectSearchResult(page, word, requestedResult) {
   } catch (error) {
     throw new Error(`「${word}」の検索結果を取得できませんでした。`, { cause: error });
   }
+}
+
+/** Select NHK's 「検索語で始まる」 mode and re-run search. */
+async function enableStartsWithSearch(page, word) {
+  const alreadyStartsWith = await page.locator('input#radio-2').isChecked();
+  if (!alreadyStartsWith) {
+    // The radio input is covered by labels; prefer the text label.
+    await page.locator('label.radio-label[for="radio-2"]').click({ force: true });
+    await page.locator('#searchbtn').click();
+    await waitForSearchResults(page, word);
+  }
+
+  const checked = await page.locator('input[name="prefix"]:checked').getAttribute('value');
+  if (checked !== '1') {
+    throw new Error('「検索語で始まる」を選択できませんでした。');
+  }
+}
+
+async function selectSearchResult(page, word, requestedResult) {
+  const resultLinks = page.locator('#searchResult > a');
+  await waitForSearchResults(page, word);
+  await enableStartsWithSearch(page, word);
 
   const countText =
     (await page.locator('#search_count').textContent())?.trim() ?? '';
@@ -193,11 +214,21 @@ async function selectSearchResult(page, word, requestedResult) {
   if (requestedResult) {
     selectedIndex = requestedResult - 1;
   } else {
-    selectedIndex = results.findIndex(
-      ({ title, caption }) => title === word || caption === word,
-    );
+    // Prefer exact title match, then exact caption match. Never fall back to
+    // the first unrelated result (e.g. 市 / 村 village names).
+    selectedIndex = results.findIndex(({ title }) => title === word);
     if (selectedIndex < 0) {
-      selectedIndex = 0;
+      selectedIndex = results.findIndex(({ caption }) => caption === word);
+    }
+    if (selectedIndex < 0) {
+      const preview = results
+        .slice(0, 8)
+        .map((entry, index) => `${index + 1}:${entry.title}`)
+        .join(', ');
+      throw new Error(
+        `「${word}」の完全一致が見つかりませんでした（${results.length}件: ${preview}）。` +
+          ` --result で番号を指定してください。`,
+      );
     }
   }
 

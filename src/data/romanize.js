@@ -193,7 +193,7 @@ export function videoFileNameFromReading(caption, existingWords = [], { extensio
   let suffix = 2;
 
   while (used.has(fileName.toLowerCase())) {
-    fileName = `${base}-${suffix}.${extension}`;
+    fileName = `${base}_${suffix}.${extension}`;
     suffix += 1;
   }
 

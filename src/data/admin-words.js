@@ -63,7 +63,7 @@ export const ADMIN_WORDS = [
     video: './videos/akeru.webm',
   },
   {
-    title: 'あげる',
+    title: '上げる',
     caption: 'あげる',
     id: '8f98b86f-4bd0-4f16-867f-72148b8d5c3c',
     video: './videos/ageru.webm',
@@ -193,6 +193,12 @@ export const ADMIN_WORDS = [
     caption: 'いえ',
     id: '51cdc6fa-c1f8-4372-8888-04b55b8ea280',
     video: './videos/ie.webm',
+  },
+  {
+    title: '生き方',
+    caption: 'いきかた',
+    id: 'ae5b500f-844c-4745-a052-964465604d4f',
+    video: './videos/ikikata.webm',
   },
   {
     title: '行く',
@@ -435,16 +441,10 @@ export const ADMIN_WORDS = [
     video: './videos/oku.webm',
   },
   {
-    title: '贈る',
+    title: '送る',
     caption: 'おくる',
     id: '91bea8ed-498b-4ed4-ae24-56f2a843b29a',
     video: './videos/okuru.webm',
-  },
-  {
-    title: '送る',
-    caption: 'おくる',
-    id: '75371343-db0b-4b04-9292-f99845f280e4',
-    video: './videos/okuru-2.webm',
   },
   {
     title: '怒る',
@@ -469,6 +469,12 @@ export const ADMIN_WORDS = [
     caption: 'おそい',
     id: '4bd4c829-0224-4f3e-bdd6-e355ab824676',
     video: './videos/osoi.webm',
+  },
+  {
+    title: '落ち着く',
+    caption: 'おちつく',
+    id: '093ed24a-7506-4e31-97bf-b7da6389cbe8',
+    video: './videos/tsuku.webm',
   },
   {
     title: 'お茶',
@@ -693,16 +699,10 @@ export const ADMIN_WORDS = [
     video: './videos/kaban.webm',
   },
   {
-    title: '紙',
+    title: '髪',
     caption: 'かみ',
     id: '73a55140-3a33-4676-b331-95c636ae052a',
     video: './videos/kami.webm',
-  },
-  {
-    title: '髪',
-    caption: 'かみ',
-    id: '91829309-ed89-4324-a32c-e2a1bbfa7f77',
-    video: './videos/kami-2.webm',
   },
   {
     title: '火曜日',
@@ -873,12 +873,6 @@ export const ADMIN_WORDS = [
     video: './videos/kuni.webm',
   },
   {
-    title: '首',
-    caption: 'くび',
-    id: 'aca3614a-c958-4fdf-b5ab-520ef452ec12',
-    video: './videos/kubi.webm',
-  },
-  {
     title: '熊',
     caption: 'くま',
     id: 'b6fb3da7-b197-4506-b134-41526fa08bad',
@@ -891,8 +885,8 @@ export const ADMIN_WORDS = [
     video: './videos/kumamoto.webm',
   },
   {
-    title: 'クラス',
-    caption: 'クラス',
+    title: '暮らす',
+    caption: 'くらす',
     id: '6b5c0a1f-cb09-4080-8d90-7a4cc7c8e773',
     video: './videos/kurasu.webm',
   },
@@ -937,6 +931,12 @@ export const ADMIN_WORDS = [
     caption: 'げつようび',
     id: 'b60ee6ea-aec4-46df-ab2d-52a5fa9ce372',
     video: './videos/getsuyoubi.webm',
+  },
+  {
+    title: 'けれども',
+    caption: 'けれども',
+    id: 'ca70502f-ff44-4a34-8d92-e152bd1c0843',
+    video: './videos/keredomo.webm',
   },
   {
     title: '元気',
@@ -1009,12 +1009,6 @@ export const ADMIN_WORDS = [
     caption: 'ごはん',
     id: 'f62580c3-159e-4f91-bd2c-2fc6ba7c330b',
     video: './videos/gohan.webm',
-  },
-  {
-    title: '米',
-    caption: 'こめ',
-    id: '175ae5d8-9666-412b-8a17-353b06ea84c0',
-    video: './videos/kome.webm',
   },
   {
     title: 'ごめんなさい',
@@ -1533,12 +1527,6 @@ export const ADMIN_WORDS = [
     video: './videos/tsuki.webm',
   },
   {
-    title: '着く',
-    caption: 'つく',
-    id: '093ed24a-7506-4e31-97bf-b7da6389cbe8',
-    video: './videos/tsuku.webm',
-  },
-  {
     title: '机',
     caption: 'つくえ',
     id: '3068495e-db24-48c8-be1b-719d03295fb6',
@@ -1549,12 +1537,6 @@ export const ADMIN_WORDS = [
     caption: 'つくる',
     id: '0fd68762-23ea-4134-800d-c5fb43d67b1f',
     video: './videos/tsukuru.webm',
-  },
-  {
-    title: 'つける',
-    caption: 'つける',
-    id: '81c695dd-440c-45d9-8ed8-bd90ffb2fe54',
-    video: './videos/tsukeru.webm',
   },
   {
     title: '妻',
@@ -1891,6 +1873,12 @@ export const ADMIN_WORDS = [
     caption: 'はいる',
     id: '4290a832-8474-46d3-9c9e-b1b57e8173e8',
     video: './videos/hairu.webm',
+  },
+  {
+    title: '白米',
+    caption: 'はくまい',
+    id: 'b2a34272-77a2-4bf9-af8c-b3ee55ae3129',
+    video: './videos/hakumai.webm',
   },
   {
     title: '橋',
