@@ -1,0 +1,98 @@
+[2026-08-17T16:41:10.939Z] Recording 「失礼」 via 「失礼」 → ./videos/shitsurei.webm
+[2026-08-17T16:42:51.570Z] OK 「失礼」 via 「失礼」
+[2026-08-17T16:42:51.572Z] SKIP existing 「大きい」 → ./videos/ookii.webm
+[2026-08-17T16:42:51.574Z] SKIP existing 「小さい」 → ./videos/chiisai.webm
+[2026-08-17T16:42:51.575Z] Waiting 60s before next word…
+[2026-08-17T16:43:51.583Z] Recording 「トマト」 via 「トマト」 → ./videos/tomato.webm
+[2026-08-17T16:45:30.977Z] OK 「トマト」 via 「トマト」
+[2026-08-17T16:45:30.978Z] Waiting 60s before next word…
+[2026-08-17T16:46:30.992Z] Recording 「苦手」 via 「苦手」 → ./videos/nigate.webm
+[2026-08-17T16:48:58.663Z] OK 「苦手」 via 「苦手」
+[2026-08-17T16:48:58.665Z] Waiting 60s before next word…
+[2026-08-17T16:49:58.680Z] Recording 「合わない」 via 「合わない」 → ./videos/awanai.webm
+[2026-08-17T16:55:21.956Z] OK 「合わない」 via 「合わない」
+[2026-08-17T16:55:21.958Z] Waiting 60s before next word…
+[2026-08-17T16:56:21.998Z] Recording 「合う」 via 「合う」 → ./videos/au_2.webm
+[2026-08-17T17:00:28.448Z] OK 「合う」 via 「合う」
+[2026-08-17T17:00:28.453Z] Waiting 60s before next word…
+[2026-08-17T17:01:28.470Z] Recording 「きゅうり」 via 「きゅうり」 → ./videos/kyuuri.webm
+[2026-08-17T17:06:49.313Z] OK 「きゅうり」 via 「きゅうり」
+[2026-08-17T17:06:49.315Z] Waiting 60s before next word…
+[2026-08-17T17:07:49.330Z] Recording 「サランラップ」 via 「サランラップ」 → ./videos/saranrappu.webm
+[2026-08-17T17:07:55.397Z] MISS 「サランラップ」 via 「サランラップ」
+[2026-08-17T17:07:55.399Z] Recording 「サランラップ」 via 「ラップ」 → ./videos/saranrappu.webm
+[2026-08-17T17:11:17.066Z] OK 「サランラップ」 via 「ラップ」
+[2026-08-17T17:11:17.068Z] Waiting 60s before next word…
+[2026-08-17T17:12:17.100Z] Recording 「アルミホイル」 via 「アルミホイル」 → ./videos/arumihoiru.webm
+[2026-08-17T17:12:23.970Z] MISS 「アルミホイル」 via 「アルミホイル」
+[2026-08-17T17:12:23.972Z] FAIL 「アルミホイル」
+[2026-08-17T17:12:23.974Z] Waiting 60s before next word…
+[2026-08-17T17:13:23.992Z] Recording 「虹」 via 「虹」 → ./videos/niji.webm
+[2026-08-17T17:17:16.623Z] OK 「虹」 via 「虹」
+[2026-08-17T17:17:16.625Z] Waiting 60s before next word…
+[2026-08-17T17:18:16.645Z] Recording 「１等」 via 「一等」 → ./videos/ittou.webm
+[2026-08-17T17:18:22.647Z] MISS 「１等」 via 「一等」
+[2026-08-17T17:18:22.649Z] Recording 「１等」 via 「１等」 → ./videos/ittou.webm
+[2026-08-17T17:18:27.863Z] MISS 「１等」 via 「１等」
+[2026-08-17T17:18:27.865Z] Recording 「１等」 via 「1等」 → ./videos/ittou.webm
+[2026-08-17T17:21:48.300Z] OK 「１等」 via 「1等」
+[2026-08-17T17:21:48.301Z] Waiting 60s before next word…
+[2026-08-17T17:22:48.319Z] Recording 「目標」 via 「目標」 → ./videos/mokuhyou.webm
+[2026-08-17T17:23:47.140Z] OK 「目標」 via 「目標」
+[2026-08-17T17:23:47.140Z] Waiting 60s before next word…
+[2026-08-17T17:24:47.157Z] Recording 「金」 via 「金」 → ./videos/kin.webm
+[2026-08-17T17:26:02.977Z] OK 「金」 via 「金」
+[2026-08-17T17:26:02.978Z] Waiting 60s before next word…
+[2026-08-17T17:27:02.999Z] Recording 「銀」 via 「銀」 → ./videos/gin.webm
+[2026-08-17T17:27:56.924Z] OK 「銀」 via 「銀」
+[2026-08-17T17:27:56.925Z] SKIP existing 「違う」 → ./videos/chigau.webm
+[2026-08-17T17:27:56.926Z] Waiting 60s before next word…
+[2026-08-17T17:28:56.951Z] Recording 「銅」 via 「銅」 → ./videos/dou_2.webm
+[2026-08-17T17:30:40.391Z] OK 「銅」 via 「銅」
+[2026-08-17T17:30:40.392Z] Waiting 60s before next word…
+[2026-08-17T17:31:40.407Z] Recording 「嫌い」 via 「嫌い」 → ./videos/kirai.webm
+[2026-08-17T17:32:50.148Z] OK 「嫌い」 via 「嫌い」
+[2026-08-17T17:32:50.149Z] SKIP existing 「色」 → ./videos/iro.webm
+[2026-08-17T17:32:50.150Z] Waiting 60s before next word…
+[2026-08-17T17:33:50.161Z] Recording 「赤い」 via 「赤い」 → ./videos/akai.webm
+[2026-08-17T17:33:52.767Z] MISS 「赤い」 via 「赤い」
+[2026-08-17T17:33:52.768Z] FAIL 「赤い」
+[2026-08-17T17:33:52.769Z] Waiting 60s before next word…
+[2026-08-17T17:34:52.782Z] Recording 「オレンジ色」 via 「オレンジ色」 → ./videos/orenjiiro.webm
+[2026-08-17T17:34:56.938Z] MISS 「オレンジ色」 via 「オレンジ色」
+[2026-08-17T17:34:56.939Z] Recording 「オレンジ色」 via 「オレンジ」 → ./videos/orenjiiro.webm
+[2026-08-17T17:37:01.398Z] OK 「オレンジ色」 via 「オレンジ」
+[2026-08-17T17:37:01.402Z] SKIP existing 「黄色」 → ./videos/kiiro.webm
+[2026-08-17T17:37:01.405Z] SKIP existing 「どちら」 → ./videos/dochira.webm
+[2026-08-17T17:37:01.409Z] SKIP existing 「緑」 → ./videos/midori.webm
+[2026-08-17T17:37:01.411Z] SKIP existing 「青」 → ./videos/ao.webm
+[2026-08-17T17:37:01.413Z] Waiting 60s before next word…
+[2026-08-17T17:38:01.425Z] Recording 「紫」 via 「紫」 → ./videos/murasaki.webm
+[2026-08-17T17:40:50.083Z] OK 「紫」 via 「紫」
+[2026-08-17T17:40:50.084Z] SKIP existing 「茶色」 → ./videos/chairo.webm
+[2026-08-17T17:40:50.085Z] Waiting 60s before next word…
+[2026-08-17T17:41:50.098Z] Recording 「ピンク」 via 「ピンク」 → ./videos/pinku.webm
+[2026-08-17T17:42:44.553Z] OK 「ピンク」 via 「ピンク」
+[2026-08-17T17:42:44.554Z] SKIP existing 「黒」 → ./videos/kuro.webm
+[2026-08-17T17:42:44.555Z] Waiting 60s before next word…
+[2026-08-17T17:43:44.566Z] Recording 「灰色」 via 「灰色」 → ./videos/haiiro.webm
+[2026-08-17T17:43:47.439Z] MISS 「灰色」 via 「灰色」
+[2026-08-17T17:43:47.439Z] FAIL 「灰色」
+[2026-08-17T17:43:47.440Z] Waiting 60s before next word…
+[2026-08-17T17:44:47.450Z] Recording 「透明」 via 「透明」 → ./videos/toumei.webm
+[2026-08-17T17:45:58.369Z] OK 「透明」 via 「透明」
+[2026-08-17T17:45:58.370Z] Waiting 60s before next word…
+[2026-08-17T17:46:58.385Z] Recording 「紅」 via 「紅」 → ./videos/beni.webm
+[2026-08-17T17:47:55.058Z] OK 「紅」 via 「紅」
+[2026-08-17T17:47:55.059Z] Waiting 60s before next word…
+[2026-08-17T17:48:55.071Z] Recording 「横浜」 via 「横浜」 → ./videos/yokohama.webm
+[2026-08-17T17:48:58.766Z] MISS 「横浜」 via 「横浜」
+[2026-08-17T17:48:58.766Z] FAIL 「横浜」
+[2026-08-17T17:48:58.767Z] SKIP existing 「汚い」 → ./videos/kitanai.webm
+[2026-08-17T17:48:58.768Z] Waiting 60s before next word…
+[2026-08-17T17:49:58.787Z] Recording 「濃い」 via 「濃い」 → ./videos/koi.webm
+[2026-08-17T17:50:47.319Z] OK 「濃い」 via 「濃い」
+[2026-08-17T17:50:47.320Z] Waiting 60s before next word…
+[2026-08-17T17:51:47.347Z] Recording 「薄い」 via 「薄い」 → ./videos/usui.webm
+[2026-08-17T17:53:41.744Z] OK 「薄い」 via 「薄い」
+[2026-08-17T17:53:41.745Z] Done. ok=21 skipped=11 failed=4
