@@ -316,6 +316,13 @@ export const WORDS = [
   },
   {
     lesson: 4,
+    title: '白',
+    caption: 'しろ',
+    id: 'b817943d-e65f-4c90-835e-9705fbc4c3a1',
+    video: './videos/shiro.webm',
+  },
+  {
+    lesson: 4,
     title: '大きい',
     caption: 'おおきい',
     id: 'e006fbd5-0449-41cf-a33d-e8197351357d',
