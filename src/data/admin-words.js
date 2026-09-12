@@ -435,12 +435,6 @@ export const ADMIN_WORDS = [
     video: './videos/okiru.webm',
   },
   {
-    title: '置く',
-    caption: 'おく',
-    id: 'a8a7efd0-baf2-4b90-8600-d30be3bf1898',
-    video: './videos/oku.webm',
-  },
-  {
     title: '送る',
     caption: 'おくる',
     id: '91bea8ed-498b-4ed4-ae24-56f2a843b29a',
