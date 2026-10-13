@@ -1,4 +1,8 @@
 node_modules/
+# Videos live in the Railway bucket; local copies are not tracked.
+videos/
+video-backup/
 dist/
 .env
 .env.*
+!.env.example

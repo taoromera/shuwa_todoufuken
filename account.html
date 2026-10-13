@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a365d" />
+    <title>アカウント ・ 手話単語帳</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/auth/auth.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <h1>アカウント</h1>
+        <p class="subtitle" id="account-summary"></p>
+      </header>
+
+      <section class="auth-card">
+        <h2>メールアドレスを変更</h2>
+        <form class="auth-form" id="email-form" novalidate>
+          <div class="form-field">
+            <label for="email">新しいメールアドレス</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <p class="form-status" id="email-status" role="alert" hidden></p>
+          <button type="submit" class="btn btn-next">変更する</button>
+        </form>
+      </section>
+
+      <section class="auth-card">
+        <h2>パスワードを変更</h2>
+        <form class="auth-form" id="password-form" novalidate>
+          <div class="form-field">
+            <label for="current-password">現在のパスワード</label>
+            <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" required />
+          </div>
+          <div class="form-field">
+            <label for="new-password">新しいパスワード</label>
+            <input id="new-password" name="newPassword" type="password" autocomplete="new-password" minlength="8" required />
+            <p class="form-hint">8文字以上</p>
+          </div>
+          <div class="form-field">
+            <label for="new-password-confirm">新しいパスワード（確認）</label>
+            <input id="new-password-confirm" name="newPasswordConfirm" type="password" autocomplete="new-password" required />
+          </div>
+          <p class="form-status" id="password-status" role="alert" hidden></p>
+          <button type="submit" class="btn btn-next">パスワードを変更する</button>
+        </form>
+      </section>
+
+      <section class="auth-card">
+        <h2>ログアウト</h2>
+        <p>この端末からログアウトします。</p>
+        <button type="button" class="btn btn-secondary" id="logout-btn">ログアウト</button>
+      </section>
+
+      <section class="auth-card danger-zone">
+        <h2>アカウントの削除</h2>
+        <p>アカウントを削除すると、単語帳と学習履歴もすべて削除され、元に戻せません。</p>
+        <form class="auth-form" id="delete-form" novalidate>
+          <div class="form-field">
+            <label for="delete-password">パスワード</label>
+            <input id="delete-password" name="password" type="password" autocomplete="current-password" required />
+          </div>
+          <p class="form-status" id="delete-status" role="alert" hidden></p>
+          <button type="submit" class="btn btn-danger">アカウントを削除する</button>
+        </form>
+      </section>
+    </div>
+
+    <script type="module" src="/src/auth/account.js"></script>
+  </body>
+</html>

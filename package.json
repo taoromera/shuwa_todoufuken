@@ -3,15 +3,28 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.9"
+  },
   "scripts": {
-    "dev": "vite",
+    "dev": "node --watch-path=./server server/index.js",
     "build": "vite build",
-    "preview": "vite preview",
-    "record:sign": "node scripts/record-nhk-sign.mjs",
-    "record:batch": "node scripts/batch-record-signs.mjs"
+    "start": "node server/index.js --production",
+    "set-admin": "node scripts/set-admin.mjs",
+    "record:sign": "node scripts/record-nhk-sign.mjs"
   },
   "devDependencies": {
     "playwright": "^1.61.1",
     "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1149.0",
+    "@aws-sdk/s3-request-presigner": "^3.1149.0",
+    "better-auth": "^1.7.7",
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0",
+    "mongodb": "^6.21.0",
+    "resend": "^6.32.1",
+    "ts-fsrs": "^5.4.2"
   }
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a365d" />
+    <title>単語帳 ・ 手話単語帳</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/auth/auth.css" />
+    <link rel="stylesheet" href="/src/library/library.css" />
+    <link rel="stylesheet" href="/src/deck/deck.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <h1>単語帳</h1>
+        <p class="subtitle">自分で復習するカード</p>
+      </header>
+
+      <p class="form-status form-status--success deck-flash" id="deck-flash" role="status" hidden></p>
+
+      <a class="btn btn-next deck-add-btn" href="/deck/add">＋ カードを追加</a>
+
+      <div class="library-search">
+        <label class="lesson-picker-label" for="deck-filter">単語帳内を検索</label>
+        <input class="library-search-input" id="deck-filter" type="search" autocomplete="off" />
+        <p class="library-count" id="deck-count" aria-live="polite"></p>
+      </div>
+
+      <main class="library-list" id="deck-list"></main>
+    </div>
+
+    <script type="module" src="/src/deck/deck.js"></script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a365d" />
+    <title>カードを追加 ・ 手話単語帳</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/auth/auth.css" />
+    <link rel="stylesheet" href="/src/library/library.css" />
+    <link rel="stylesheet" href="/src/deck/deck.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <h1>カードを追加</h1>
+        <p class="subtitle">ライブラリから選ぶか、新しい動画を追加します</p>
+      </header>
+
+      <!-- Step 1: search the shared library -->
+      <section class="add-section" id="step-search">
+        <div class="library-search">
+          <label class="lesson-picker-label" for="word-query">追加したい言葉</label>
+          <input
+            class="library-search-input"
+            id="word-query"
+            type="search"
+            placeholder="例：ありがとう"
+            autocomplete="off"
+            enterkeyhint="search"
+          />
+          <p class="library-count" id="search-count" aria-live="polite"></p>
+        </div>
+        <div class="library-list" id="search-results"></div>
+        <section class="auth-card">
+          <h2>ぴったりの動画がない場合</h2>
+          <p>YouTube の動画から切り出すか、スマホで撮った動画をアップロードできます。追加した動画はライブラリでみんなと共有されます。</p>
+          <div class="add-source-buttons">
+            <button type="button" class="btn" id="choose-youtube">YouTube から</button>
+            <button type="button" class="btn" id="choose-upload">動画をアップロード</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- Step 2a: pick a library video, fill labels -->
+      <section class="add-section auth-card" id="step-library" hidden>
+        <h2>この動画を単語帳に追加</h2>
+        <div id="library-preview"></div>
+        <form class="auth-form" id="library-form" novalidate></form>
+      </section>
+
+      <!-- Step 2b: YouTube rough range -->
+      <section class="add-section auth-card" id="step-youtube" hidden>
+        <h2>YouTube から切り出す</h2>
+        <form class="auth-form" id="youtube-url-form" novalidate>
+          <div class="form-field">
+            <label for="youtube-url">YouTube の動画URL</label>
+            <input id="youtube-url" name="url" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=…" required />
+          </div>
+          <button type="submit" class="btn btn-secondary" id="youtube-load">動画を読み込む</button>
+        </form>
+        <div class="add-section" id="youtube-picker"></div>
+        <p class="form-status form-status--error" id="youtube-status" role="alert" hidden></p>
+        <button type="button" class="btn btn-next" id="youtube-fetch" hidden>次へ</button>
+        <button type="button" class="btn btn-secondary" data-back>戻る</button>
+      </section>
+
+      <!-- Step 2c: upload from device -->
+      <section class="add-section auth-card" id="step-upload" hidden>
+        <h2>動画をアップロード</h2>
+        <p>200MB・3分以内の動画を選んでください。次の画面で必要な部分だけ切り出せます。</p>
+        <div class="form-field">
+          <label for="upload-file">動画ファイル</label>
+          <input id="upload-file" type="file" accept="video/*" />
+        </div>
+        <div class="progress" id="upload-progress" hidden><div class="progress-bar" id="upload-progress-bar"></div></div>
+        <p class="busy-note" id="upload-busy" hidden></p>
+        <p class="form-status form-status--error" id="upload-status" role="alert" hidden></p>
+        <button type="button" class="btn btn-secondary" data-back>戻る</button>
+      </section>
+
+      <!-- Step 3: trim / crop / labels for a new video -->
+      <section class="add-section auth-card" id="step-edit" hidden>
+        <h2>切り出しと切り抜き</h2>
+        <div class="add-section" id="clip-editor"></div>
+        <form class="auth-form" id="edit-form" novalidate></form>
+      </section>
+    </div>
+
+    <div class="loading-overlay" id="loading-overlay" role="alertdialog" aria-modal="true" aria-labelledby="loading-title" hidden>
+      <div class="loading-box">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="loading-title" id="loading-title">読み込み中…</p>
+        <p class="loading-hint">30秒ほどかかることがあります</p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/deck/add-card.js"></script>
+  </body>
+</html>

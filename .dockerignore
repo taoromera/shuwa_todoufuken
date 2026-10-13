@@ -1,0 +1,10 @@
+node_modules
+dist
+videos
+.env
+.env.*
+!.env.example
+.git
+.cursor
+*.log
+*.tmp.mjs

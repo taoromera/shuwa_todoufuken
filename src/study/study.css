@@ -1,0 +1,102 @@
+.study-message[hidden],
+.study-loading[hidden] {
+  display: none;
+}
+
+.study-counter {
+  align-self: center;
+  margin: 0;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.study-counter[hidden] {
+  display: none;
+}
+
+.study-notes {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--primary-soft);
+  white-space: pre-wrap;
+}
+
+.study-notes[hidden] {
+  display: none;
+}
+
+.rating-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.rating-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 72px;
+  padding: 6px 2px;
+  border: 0;
+  border-radius: var(--radius);
+  color: #fff;
+  font: inherit;
+  font-size: clamp(0.75rem, 3.6vw, 0.95rem);
+  white-space: nowrap;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+
+.rating-btn:active {
+  transform: scale(0.97);
+}
+
+.rating-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.rating-btn--again {
+  background: #c53030;
+}
+
+.rating-btn--hard {
+  background: #c05621;
+}
+
+.rating-btn--good {
+  background: #2f855a;
+}
+
+.rating-btn--easy {
+  background: #2b6cb0;
+}
+
+.study-message p {
+  white-space: pre-line;
+}
+
+.study-message-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.study-message-action[hidden] {
+  display: none;
+}
+
+.study-loading {
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+}

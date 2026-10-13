@@ -1,46 +1,21 @@
-# 手話フラッシュカード
+# 手話単語帳
 
-レッスンで学んだ日本手話を、自分で用意した動画で復習するフラッシュカードアプリです。
+日本手話を、間隔反復（FSRS）で復習する単語帳アプリです。ユーザーごとに単語帳と学習履歴を持ちます。
 
-## 復習モード
+## 復習
 
-- **手話 → 言葉**: 手話動画を見て、言葉を思い出す
-- **言葉 → 手話**: 言葉を見て、手話を思い浮かべてから答えを確認
+トップページ（`/`）で、言葉を見て手話を思い浮かべ、答えの動画を確認してから「もう一度・難しい・正解・簡単」で評価します。ボタンには次に出てくるまでの間隔が表示されます。キーボードでは Space / Enter で答えを表示、1〜4 で評価できます。
+
+- 今日が期限のカード（期限の古い順）を先に、そのあと新しいカードを出します
+- 新しいカード・忘れたカードは、1分後・10分後にもう一度出てから次の日以降に回ります
+- 1日は朝4時に切り替わります
+- 新しいカードは1日500枚まで、目標の正答率は90%（固定）
 
 ## はじめに
 
-### 1. 動画を用意する
+### 1. 環境変数
 
-各単語の動画を `videos/` フォルダに置き、カードの `video` に相対パスを書きます。
-
-```js
-{
-  lesson: 3,
-  title: '北海道',
-  caption: 'ほっかいどう',
-  video: './videos/hokkaido.webm',
-},
-```
-
-動画がある単語だけがデッキに含まれます。
-
-#### NHK手話CGを録画する
-
-Playwright用のChromiumとffmpegを用意すると、指定した単語の手話CGをアニメーション1ループ分のWebM動画（30fps）として録画できます。手話CGを1フレームずつ静止させて取得するため、書き出しには数分かかります。
-
-```bash
-npx playwright install chromium ffmpeg
-npm run record:sign -- "作る"
-```
-
-既定では `videos/作る.webm` に保存されます。出力先や検索結果を指定する場合:
-
-```bash
-npm run record:sign -- "作る" --output videos/tsukuru.webm
-npm run record:sign -- "作る" --result 2
-```
-
-録画はNHKの検索結果から完全一致する単語を優先し、該当しない場合は最初の結果を使います。`--result` は検索結果の1番目を `1` として指定します。出力はアニメーション1ループ分（30fps）で、同名の出力ファイルがある場合は上書きします。個人学習の範囲で利用し、NHKサイトの利用条件と著作権を確認してください。
+`.env.example` を `.env` にコピーし、MongoDB の接続文字列などを設定します。ローカルでは `RESEND_API_KEY` を空にしておくと、パスワード再設定のリンクがサーバーのコンソールに表示されます。
 
 ### 2. 開発サーバー
 
@@ -49,37 +24,61 @@ npm install
 npm run dev
 ```
 
-### 3. ビルド
+`http://localhost:3000` を開き、新規登録してください。管理者にするアカウントは次のコマンドで設定します（反映まで最大5分、または再ログイン）。
+
+```bash
+npm run set-admin -- you@example.com
+```
+
+### 3. 動画ライブラリ（Railway バケット）
+
+動画は Railway のバケットに保存し、`/videos/<ファイル名>` へのアクセスはログイン確認後に署名付きURLへリダイレクトします。`S3_*` が未設定の場合、開発サーバーはローカルの `videos/` フォルダから配信します。
+
+ライブラリの一覧・検索は `/library` です。管理者は言葉・読み・別名の編集と削除ができます（削除すると、その動画を使っている全ユーザーのカードも削除されます）。
+
+### 4. 単語帳
+
+各ユーザーは `/deck` で自分のカードを管理し、`/deck/add` から追加します。ライブラリに動画がなければ、YouTube のURLから切り出すか、スマホの動画（200MB・3分以内）をアップロードします。サーバー側で切り出し・切り抜きをして webm に変換し、ライブラリに共有登録します。
+
+このため、サーバーには `ffmpeg`・`ffprobe`・`yt-dlp` が必要です（ローカル開発でも PATH に入れておいてください）。
+
+### 5. 本番（Railway）
+
+リポジトリの `Dockerfile` でビルドされます（`railway.json` でヘルスチェック `/healthz` を設定済み）。イメージには `ffmpeg` と `yt-dlp` が含まれます。Railway のサービス変数に `.env.example` の項目を設定してください。
+
+- `BETTER_AUTH_URL` は公開URL（例: `https://shuwa.up.railway.app`）
+- `RESEND_API_KEY` / `EMAIL_FROM` と `S3_*` は本番では必須
+- `PORT` は Railway が自動で設定します
+
+YouTube からの取得が失敗し始めたら `yt-dlp` が古い可能性があります。ビルドキャッシュなしで再デプロイすると最新版が入ります。
+
+ローカルで本番モードを確認する場合:
 
 ```bash
 npm run build
-npm run preview
+npm start
 ```
 
-## 単語の追加方法
+## NHK手話CGを録画する
 
-### 管理ページ（`manage.html`）
+Playwright用のChromiumとffmpegを用意すると、指定した単語の手話CGをアニメーション1ループ分のWebM動画（30fps）として録画できます。手話CGを1フレームずつ静止させて取得するため、書き出しには数分かかります。録画した動画は `/deck/add` の「動画をアップロード」から追加できます。
 
-`npm run dev` で起動し、ブラウザで `manage.html` を開きます。単語の追加・削除は `src/data/words.js` に直接書き込まれます。
-
-### `src/data/words.js` を直接編集
-
-```js
-{
-  lesson: 2,
-  title: 'ありがとう',
-  caption: 'ありがとう',
-  id: 'unique-id',
-  video: './videos/arigatou.webm',
-},
+```bash
+npx playwright install chromium ffmpeg
+npm run record:sign -- "作る"
+npm run record:sign -- "作る" --output videos/tsukuru.webm --result 2
 ```
+
+録画はNHKの検索結果から完全一致する単語を優先し、該当しない場合は最初の結果を使います。`--result` は検索結果の1番目を `1` として指定します。個人学習の範囲で利用し、NHKサイトの利用条件と著作権を確認してください。
 
 ## ファイル構成
 
 ```text
-src/
-  data/words.js       # レッスン単語リスト（video パス含む）
-videos/               # 手話動画（自分で用意）
+server/        # Express + Better Auth + API（ライブラリ・単語帳・動画処理・FSRS）
+src/study/     # 復習ページ
+src/deck/      # 単語帳・カード追加
+src/library/   # 動画ライブラリ
+src/auth/      # ログイン・アカウント
 ```
 
 ## 注意

@@ -1,0 +1,123 @@
+.library-search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow);
+}
+
+.library-search-input {
+  min-height: var(--tap);
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.library-search-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.library-count {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.library-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.library-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.library-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.library-item-text {
+  min-width: 0;
+}
+
+.library-item-text p {
+  margin: 0;
+}
+
+.library-item-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.library-item-caption,
+.library-item-aliases {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.library-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.library-btn {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.library-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.library-btn--primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.library-btn--danger {
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.library-item-media[hidden] {
+  display: none;
+}
+
+.library-edit {
+  width: 100%;
+}
+
+.library-edit .form-status--error {
+  background: #fff1f2;
+  color: #b42318;
+}

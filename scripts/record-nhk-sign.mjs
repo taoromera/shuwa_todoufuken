@@ -429,9 +429,8 @@ async function encodeVp9(inputArgs, outputPath, { videoFilter, frameCount } = {}
     ...inputArgs,
   ];
 
-  if (videoFilter) {
-    args.push('-vf', videoFilter);
-  }
+  // Chrome's hardware VP9 decoder fails on full-range ("pc") video.
+  args.push('-vf', [videoFilter, 'scale=out_range=limited'].filter(Boolean).join(','));
 
   args.push(
     '-an',
@@ -439,6 +438,8 @@ async function encodeVp9(inputArgs, outputPath, { videoFilter, frameCount } = {}
     'libvpx-vp9',
     '-pix_fmt',
     'yuv420p',
+    '-color_range',
+    'tv',
     '-crf',
     '18',
     '-b:v',

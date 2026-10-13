@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a365d" />
+    <title>新規登録 ・ 手話単語帳</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/auth/auth.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <h1>手話単語帳</h1>
+        <p class="subtitle">アカウントを作成して、自分だけの単語帳で復習しよう</p>
+      </header>
+
+      <main class="auth-card">
+        <h2>新規登録</h2>
+        <form class="auth-form" id="signup-form" novalidate>
+          <div class="form-field">
+            <label for="email">メールアドレス</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="form-field">
+            <label for="password">パスワード</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required />
+            <p class="form-hint">8文字以上</p>
+          </div>
+          <div class="form-field">
+            <label for="password-confirm">パスワード（確認）</label>
+            <input id="password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" required />
+          </div>
+          <p class="form-status" id="form-status" role="alert" hidden></p>
+          <button type="submit" class="btn btn-next">登録する</button>
+        </form>
+        <div class="auth-links">
+          <a href="/login" id="login-link">すでにアカウントをお持ちの方はこちら</a>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/src/auth/signup.js"></script>
+  </body>
+</html>
