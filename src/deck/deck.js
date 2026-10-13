@@ -1,4 +1,5 @@
 import { mountAppHeader } from '../auth/user-menu.js';
+import { studyDayStart } from '../study/study-api.js';
 import { deleteCard, listCards, updateCard } from './cards-api.js';
 import { button, el, playToggle, textField } from './dom.js';
 
@@ -9,6 +10,8 @@ const elements = {
   flash: document.getElementById('deck-flash'),
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 const state = { cards: [] };
 
 function normalize(value) {
@@ -16,6 +19,13 @@ function normalize(value) {
     .normalize('NFKC')
     .replace(/[\u30a1-\u30f6]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0x60))
     .toLowerCase();
+}
+
+/** Study days until the card is shown again; new and overdue cards are due today. */
+function dueLabel(due) {
+  if (!due) return '今日';
+  const days = Math.round((studyDayStart(new Date(due)) - studyDayStart()) / DAY_MS);
+  return days > 0 ? `${days}日後` : '今日';
 }
 
 function renderEditForm(card, row) {
@@ -60,10 +70,10 @@ function renderCard(card) {
   const row = el('article', 'library-item');
   const header = el('div', 'library-item-header');
   const text = el('div', 'library-item-text');
-  text.append(el('p', 'library-item-title', card.title));
-  if (card.caption && card.caption !== card.title) {
-    text.append(el('p', 'library-item-caption', card.caption));
-  }
+  text.append(
+    el('p', 'library-item-title', card.title),
+    el('p', 'library-item-caption', `次の復習: ${dueLabel(card.due)}`),
+  );
   if (card.notes) text.append(el('p', 'deck-notes', card.notes));
 
   const media = el('div', 'library-item-media');

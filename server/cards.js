@@ -46,6 +46,7 @@ function toApiCard(card, video) {
     notes: card.notes,
     libraryVideoId: card.libraryVideoId.toHexString(),
     video: video ? videoPath(video) : null,
+    due: card.srs?.due ?? null,
     createdAt: card.createdAt,
   };
 }

@@ -34,11 +34,7 @@ function stateName(srs) {
 }
 
 function toStudyItem(apiCard, doc) {
-  return {
-    ...apiCard,
-    state: stateName(doc.srs),
-    due: doc.srs?.due ?? null,
-  };
+  return { ...apiCard, state: stateName(doc.srs) };
 }
 
 async function toStudyItems(docs) {
