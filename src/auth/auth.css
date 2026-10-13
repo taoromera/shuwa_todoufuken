@@ -175,6 +175,11 @@
   color: #fff;
 }
 
+.auth-card[hidden],
+.auth-card .btn[hidden] {
+  display: none;
+}
+
 .danger-zone {
   border-color: #fecdca;
 }

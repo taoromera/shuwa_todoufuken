@@ -1,5 +1,6 @@
 import { authClient } from './auth-client.js';
 import { bindForm, field, setStatus } from './form.js';
+import { mountInstallCard } from './install.js';
 import { bindLogoutButton, mountAppHeader } from './user-menu.js';
 const summary = document.getElementById('account-summary');
 const emailInput = document.getElementById('email');
@@ -74,5 +75,10 @@ bindForm(document.getElementById('delete-form'), deleteStatus, async (formData) 
 });
 
 mountAppHeader();
+mountInstallCard({
+  card: document.getElementById('install-card'),
+  text: document.getElementById('install-text'),
+  button: document.getElementById('install-btn'),
+});
 bindLogoutButton(document.getElementById('logout-btn'));
 void loadUser();

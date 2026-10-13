@@ -59,6 +59,12 @@ npm run build
 npm start
 ```
 
+## スマホのホーム画面に追加
+
+ブラウザからホーム画面に追加すると、アプリのように全画面で開けます（オフラインでは使えません）。Android の Chrome では `/account` の「ホーム画面に追加する」ボタン、iPhone では Safari の共有ボタン →「ホーム画面に追加」から追加します。
+
+アイコンは `public/icons/` にあり、`npm run icons` で作り直せます（Playwright の Chromium が必要）。
+
 ## NHK手話CGを録画する
 
 Playwright用のChromiumとffmpegを用意すると、指定した単語の手話CGをアニメーション1ループ分のWebM動画（30fps）として録画できます。手話CGを1フレームずつ静止させて取得するため、書き出しには数分かかります。録画した動画は `/deck/add` の「動画をアップロード」から追加できます。

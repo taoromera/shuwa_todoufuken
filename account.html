@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#1a365d" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="手話単語帳" />
     <title>アカウント ・ 手話単語帳</title>
     <link rel="stylesheet" href="/src/style.css" />
     <link rel="stylesheet" href="/src/auth/auth.css" />
@@ -14,6 +18,12 @@
         <h1>アカウント</h1>
         <p class="subtitle" id="account-summary"></p>
       </header>
+
+      <section class="auth-card" id="install-card" hidden>
+        <h2>ホーム画面に追加</h2>
+        <p id="install-text"></p>
+        <button type="button" class="btn btn-next" id="install-btn" hidden>ホーム画面に追加する</button>
+      </section>
 
       <section class="auth-card">
         <h2>メールアドレスを変更</h2>

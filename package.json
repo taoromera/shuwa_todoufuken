@@ -11,7 +11,8 @@
     "build": "vite build",
     "start": "node server/index.js --production",
     "set-admin": "node scripts/set-admin.mjs",
-    "record:sign": "node scripts/record-nhk-sign.mjs"
+    "record:sign": "node scripts/record-nhk-sign.mjs",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "devDependencies": {
     "playwright": "^1.61.1",
